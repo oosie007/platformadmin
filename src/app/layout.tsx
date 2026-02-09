@@ -7,8 +7,8 @@ import { MigrationsProvider } from "@/contexts/migrations-context";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "S6 → Catalyst Migration Console",
-  description: "Manage migrations from legacy System 6 to Catalyst",
+  title: "Platform Admin Console",
+  description: "Admin console for products, policies, and customers",
 };
 
 export default function RootLayout({
@@ -28,7 +28,7 @@ export default function RootLayout({
                   <header className="flex h-14 shrink-0 items-center gap-2 border-b border-border bg-card px-4">
                     <div className="md:hidden flex items-center gap-2">
                       <SidebarTrigger />
-                      <span className="font-semibold text-foreground">Migration Console</span>
+                      <span className="font-semibold text-foreground">Platform Admin Console</span>
                     </div>
                     <div className="flex-1 min-w-0" />
                     <ModeToggle />

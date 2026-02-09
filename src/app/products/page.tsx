@@ -15,6 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 
 export interface Product {
   id: string;
@@ -124,9 +125,14 @@ export default function ProductsPage() {
     <div className="p-6 md:p-8">
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-            Products
-          </h1>
+          <div className="flex flex-wrap items-center gap-2">
+            <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+              Products
+            </h1>
+            <Badge variant="outline" className="text-muted-foreground font-normal">
+              Draft — not API connected
+            </Badge>
+          </div>
           <p className="mt-1 text-muted-foreground">
             Search and view product definitions created in the system.
           </p>

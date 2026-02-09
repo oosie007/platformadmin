@@ -5,9 +5,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
-  ListTodo,
-  Plus,
-  PlusCircle,
   Package,
   FileText,
   Users,
@@ -44,10 +41,7 @@ import { logAudit } from "@/lib/audit-client";
 
 const nav = [
   { label: "Dashboard", href: "/", icon: LayoutDashboard },
-  { label: "Migrations", href: "/migrations", icon: ListTodo },
-  { label: "New migration", href: "/migrations/new", icon: PlusCircle },
   { label: "Products", href: "/products", icon: Package },
-  { label: "Create", href: "/products/create", icon: Plus, parent: "Products" },
   { label: "Policies", href: "/policies", icon: FileText },
   { label: "Customers", href: "/customers", icon: Users },
 ];
@@ -197,9 +191,8 @@ function SidebarContent({ collapsed, onNavClick, headerExtra, sidebarToggle }: S
         {nav.map((item) => {
           const isActive =
             pathname === item.href ||
-            (item.href === "/migrations" && pathname.startsWith("/migrations/") && pathname !== "/migrations/new") ||
-            (item.href === "/products" && pathname.startsWith("/products") && !pathname.startsWith("/products/new")) ||
-            (item.href === "/products/create" && (pathname.startsWith("/products/new") || pathname === "/products/create")) ||
+            (item.href === "/products" && pathname.startsWith("/products")) ||
+            (item.href === "/policies" && pathname.startsWith("/policies")) ||
             (item.href === "/customers" && pathname.startsWith("/customers"));
           const isSubItem = "parent" in item && item.parent;
           return (
