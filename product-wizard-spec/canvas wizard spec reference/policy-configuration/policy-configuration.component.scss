@@ -1,0 +1,123 @@
+@import '../../../styles/date-picker';
+.policy-configuration {
+  &__event-toggle {
+    @apply cds-mb-lg1 cds-pl-1;
+    .cb-toggle__text {
+      @apply cds-font-bold;
+    }
+  }
+  &__container {
+    @apply cds-container;
+
+    &.cb-select-choice__label {
+      @apply cds-text-sm;
+    }
+  }
+
+  &__title {
+    @apply cds-font-bold cds-font-lato cds-text-2xl cds-mb-5;
+  }
+
+  &__title2 {
+    @apply cds-font-bold cds-font-lato cds-text-mobile-headline-6-medium cds-pb-5 cds-mt-3;
+  }
+
+  &__policy-container {
+    @apply cds-border-solid cds-border-b-1 cds-border-neutral-200;
+  }
+
+  &__toggle {
+    @apply cds-mb-5 cds-w-2/4 cds-pl-1;
+
+    .cb-toggle__text {
+      @apply cds-font-bold;
+    }
+  }
+
+  &__addition-toggle {
+    @apply cds-mb-lg1 cds-pl-1 cds-pt-7;
+
+    .cb-toggle__text {
+      @apply cds-font-bold;
+    }
+  }
+
+  &__togglebody {
+    @apply cds-flex cds-items-center;
+  }
+
+  &__togglebody__partnerrenew {
+    @apply cds-flex cds-items-center cds-w-6/12;
+  }
+
+  &__divbody {
+    @apply cds-pl-1;
+  }
+
+  &__divrefund {
+    @apply cds-mb-lg1;
+
+    .cb-select-choice {
+      &__label {
+        @apply cds-mb-2;
+      }
+    }
+  }
+
+  &__refunddiv {
+    @apply cds-pl-1 cds-mb-lg1 cds-space-x-lg1;
+  }
+
+  &__body {
+    &-wrapper {
+      //@apply cds-flex cds-items-center cds-pl-1 cds-mb-lg1 cds-space-x-lg1;
+      @apply cds-flex cds-items-start cds-mb-lg1 cds-space-x-lg1;
+
+      .cb-input {
+        &__label {
+          @apply cds-mb-2;
+        }
+      }
+
+      &-margin-bottom-zero {
+        @apply cds-mb-0;
+      }
+
+      .cb-select-choice {
+        &__label {
+          @apply cds-mb-2;
+        }
+      }
+    }
+
+    // &-divwidth {
+    //   @apply cds-w-2/4;
+    // }
+  }
+
+  &__error-message-container {
+    @apply cds-flex cds-order-1;
+  }
+
+  &__form-field {
+    @apply cds-flex cds-flex-col cds-w-6/12;
+  }
+}
+
+.footer-buttons {
+  @apply cds-flex cds-justify-between cds-items-center cds-pt-12 cds-no-underline;
+
+  &--right {
+    @apply cds-flex;
+
+    .cb-button {
+      @apply cds-mx-2;
+    }
+  }
+
+  &--left {
+    .cb-button {
+      @apply cds-pl-0;
+    }
+  }
+}

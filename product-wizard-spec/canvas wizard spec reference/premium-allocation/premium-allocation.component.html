@@ -1,0 +1,198 @@
+<p-toast position="top-right" key="tr"></p-toast>
+<div class="premium-allocation">
+  <div
+    class="premium-allocation__form-content premium-allocation-content-panel"
+  >
+    <div class="premium-allocation__title">{{ labels.title }}</div>
+    <div
+      cbToggle
+      [toggleOnText]="labels.usePremiumBreakdownLabel"
+      [toggleOffText]="labels.usePremiumBreakdownLabel"
+      [showIcons]="true"
+      color="default"
+    >
+      <input
+        type="checkbox"
+        id="togglecheck"
+        [ngModel]="!hasManualBreakdown"
+        (ngModelChange)="onPremiumToggleChange($event)"
+        [disabled]="fieldsetDisabled || isPremiumEnabled"
+      />
+    </div>
+
+    @if(hasManualBreakdown || isPremiumEnabled) {
+    <form [formGroup]="premiumForm">
+      <div class="premium-allocation__configuration">
+        <div
+          class="premium-allocation__form-field cb-input premium-allocation__premium-breakdown"
+        >
+          <div
+            cbSelectChoice
+            [label]="labels.configuredBasedOn"
+            placeholder="Select"
+          >
+            <select
+              formControlName="breakDownType"
+              (change)="reRenderTable()"
+              [disabled]="fieldsetDisabled"
+            >
+              @for (premium of (breakDownTypeList | inputUnselect); track
+              premium) {
+              <option [ngValue]="premium.code">
+                {{ premium.description }}
+              </option>
+              }
+            </select>
+          </div>
+        </div>
+        @if(getBreakDownType()) {
+        <div class="premium-allocation__code-allocation">
+          <div class="premium-allocation__title">
+            {{ labels.codeAllocation }}
+          </div>
+          <div
+            class="premium-allocation__accordions-wrapper"
+            formArrayName="coverageVariants"
+          >
+            <p-table
+              [resizableColumns]="true"
+              styleClass="p-datatable-gridlines"
+              [value]="coverageVariantsArray.controls"
+              dataKey="name"
+              class="coverage-table"
+            >
+              <ng-template pTemplate="header">
+                <tr>
+                  <th pResizableColumn>{{ labels.coverageVariantName }}</th>
+                  <th pResizableColumn>
+                    <div class="allocation-percent">
+                      <span>{{ labels.allocationPercent }}</span>
+                      <cb-tooltip
+                        [explanationText]="labels.tooltipAllocation"
+                        styleVariant="stroke"
+                        colorTheme="default"
+                        direction="above-right"
+                      >
+                        <cb-icon
+                          class="link-standard__iconimage"
+                          iconKey="utility-tooltip-stroke"
+                        >
+                        </cb-icon>
+                      </cb-tooltip>
+                    </div>
+                  </th>
+                </tr>
+              </ng-template>
+
+              <ng-template pTemplate="body" let-coverage let-i="rowIndex">
+                <ng-container [formGroupName]="i">
+                  <tr>
+                    <td>
+                      @if(breakDownType.value === "STDCOVER") {
+                      {{ coverage.get('coveragesRef').value.id }} - }
+                      {{ coverage.get('coveragesRef').value.name }}
+                    </td>
+                    <td>
+                      <div cbInput [label]="''" styleVariant="default">
+                        <input
+                          type="text"
+                          formControlName="allocationPercent"
+                          placeholder="1.1234-100 %"
+                          [disabled]="fieldsetDisabled"
+                        />
+                      </div>
+                      <ng-container
+                        *ngTemplateOutlet="
+                          errorMessages;
+                          context: {
+                            $implicit: coverage.get('allocationPercent')
+                          }
+                        "
+                      ></ng-container>
+                    </td>
+                  </tr>
+                </ng-container>
+              </ng-template>
+            </p-table>
+          </div>
+        </div>
+        }
+      </div>
+    </form>
+    }
+  </div>
+</div>
+<!-- Footer section -->
+<div class="premium-allocation__footer-buttons premium-allocation-footer-panel">
+  <div class="premium-allocation__footer-buttons--left">
+    <button
+      cbButton
+      [label]="labels.backLinkLabel"
+      [leftIcon]="'utility-arrow-left'"
+      variant="ghost"
+      (click)="previous()"
+    ></button>
+  </div>
+  <div class="premium-allocation__footer-buttons--right">
+    <button
+      cbButton
+      [label]="labels.saveAndExitLabel"
+      variant="secondary"
+      [colorTheme]="colorTheme"
+      (click)="saveAndExit()"
+      [disabled]="fieldsetDisabled || !premiumForm.valid" 
+    ></button>
+    <button
+      cbButton
+      [label]="labels.nextButtonLabel"
+      variant="primary"
+      [colorTheme]="colorTheme"
+      (click)="saveAndNext()"
+    ></button>
+  </div>
+</div>
+
+<!-- Error messages -->
+<ng-template #errorMessages let-control>
+  @if(control.errors && (control?.['dirty'] || control?.['touched'])) {
+  <div class="premium-allocation__error-message-container">
+    @if(control.errors['required']) {
+    <div class="error-text-container">
+      <cb-icon
+        iconKey="utility-error-stroke"
+        iconColor="error-shade"
+        [iconSize]="iconSize"
+        [addPointerClass]="false"
+      ></cb-icon>
+      <span class="error-text-container__error-text">{{
+        labels.validationRequired
+      }}</span>
+    </div>
+    } @if(control.errors['min']) {
+    <div class="error-text-container">
+      <cb-icon
+        iconKey="utility-error-stroke"
+        iconColor="error-shade"
+        [iconSize]="iconSize"
+        [addPointerClass]="false"
+      ></cb-icon>
+      <span class="error-text-container__error-text">{{
+        labels.validationMin
+      }}</span>
+    </div>
+    } @if(control.errors['max']) {
+    <div class="error-text-container">
+      <cb-icon
+        iconKey="utility-error-stroke"
+        iconColor="error-shade"
+        [iconSize]="iconSize"
+        [addPointerClass]="false"
+      ></cb-icon>
+      <span class="error-text-container__error-text">{{
+        labels.validationMax
+      }}</span>
+    </div>
+    }
+  </div>
+  }
+</ng-template>

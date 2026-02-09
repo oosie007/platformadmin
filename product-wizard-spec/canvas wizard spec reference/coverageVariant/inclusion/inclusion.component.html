@@ -1,0 +1,86 @@
+<div class="inclusion__container">
+  <div class="inclusion__container--head">
+    <div class="inclusion__title">{{labels.title}}</div>
+    <button cbButton [label]="labels.createButtonLabel" variant="primary" leftIcon="utility-document-edit-stroke" [colorTheme]="colorTheme" (click)="toggleAddDrawer()" [disabled]="isDisabled"></button>
+  </div>
+  <div class="inclusion__search" cbSearchInput styleVariant="default" colorTheme="default">
+    <div class="cb-search-input__wrapper">
+      <span class="p-inputgroup-addon">
+        <cb-icon iconKey="utility-search" [iconColor]="'neutral-400'"></cb-icon>
+      </span>
+      <p-autoComplete
+        [(ngModel)]="searchedInclusions"
+        [suggestions]="existingInclusionList"
+        [showClear]="true"
+        field="type"
+        (completeMethod)="searchInclusions($event)"
+        [placeholder]="labels.searchInclusionPlaceholder"
+        [disabled]="isDisabled"
+        (onClear)="onSearchClear($event)"
+      >
+      </p-autoComplete>
+    </div>
+  </div>
+  <canvas-table [data]="existingInclusionList" [options]="options" (selectionChanged)="onSelectedRow($event)"></canvas-table>
+
+<div class="inclusion__footer-buttons">
+  <div class="inclusion__footer-buttons--left">
+    <button
+      cbButton
+      [label]="labels.backButtonLabel"
+      [leftIcon]="'utility-arrow-left'"
+      variant="ghost"
+      (click)="previous()"
+    ></button>
+  </div>
+  <div class="inclusion__footer-buttons--right">
+    <button
+      cbButton
+      [label]="labels.saveAndExitButtonLabel"
+      variant="secondary"
+      [colorTheme]="colorTheme"
+      (click)="saveAndExit()"
+      [disabled]="isDisabled"
+    ></button>
+    <button
+      cbButton
+      [label]="labels.nextButtonLabel"
+      variant="primary"
+      [colorTheme]="colorTheme"
+      (click)="submit()"
+    ></button>
+  </div>
+</div>
+
+<div>
+<canvas-sidebar-form
+  [title]="labels.createTitle"
+  [visible]="showCreateInclusion"
+  [fields]="inclusionSchema | fieldConfig"
+  [model]="modelCreate"
+  submitButtonLabel="Save changes"
+  cancelButtonLabel="Cancel"
+  (submitted)="onSubmitAdd($event)"
+  (cancelled)="toggleAddDrawer()"
+></canvas-sidebar-form>
+</div>
+<div>
+  <canvas-sidebar-form
+    [title]="labels.editTitle"
+    [visible]="showEditInclusion"
+    [fields]="inclusionSchema | fieldConfig"
+    [model]="modelEdit"
+    [submitButtonLabel]="labels.saveButtonLabel"
+    [cancelButtonLabel]="labels.cancelButtonLabel"
+    (submitted)="onSubmitEdit($event)"
+    (cancelled)="toggleEditDrawer()"
+  ></canvas-sidebar-form>
+  </div>
+
+  <cb-modal [open]="openDeleteModal" (closeEvent)="handleDeleteModal()" [title]="labels.deletePopupTitle"
+    message="" [hideCloseIcon]="false">
+    <div class="inclusion__modal-button-wrapper">
+      <button cbButton [label]="labels.cancelButtonLabel" variant="secondary" (click)="handleDeleteModal()"></button>
+      <button cbButton [label]="labels.confirmButtonLabel" variant="primary" colorTheme="default" (click)="deleteConfirmation()"></button>
+    </div>
+  </cb-modal>

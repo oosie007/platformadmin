@@ -1,0 +1,68 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build / output
+.next/
+out/
+build/
+dist/
+*.tsbuildinfo
+
+# Environment and sensitive files
+.env
+.env.*
+!.env.example
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+.envrc
+
+# Secrets and credentials
+*.pem
+*.key
+*.crt
+*credentials*
+*secret*
+*secrets*
+*.credentials
+*.secret
+config.local.*
+*-secret.*
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS and IDE
+.DS_Store
+Thumbs.db
+.idea/
+*.swp
+*.swo
+.vscode/
+
+# Debug and cache
+.cache/
+.parcel-cache/
+.turbo/
+.vercel
+
+# Testing
+coverage/
+.nyc_output/
+
+# Misc
+*.local
+*.bak
+*.tmp
+.temp/
+tmp/
+temp/

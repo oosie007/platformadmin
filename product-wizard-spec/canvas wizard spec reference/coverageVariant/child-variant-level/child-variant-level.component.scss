@@ -1,0 +1,219 @@
+@import '@chubb/ui-components/styles/cb-divider';
+
+.child-variant-level {
+  &__limits-form {
+    .form .form-field-container.form-width-first-half.limitsForm_Max {
+      @apply cds-pr-4 cds-pb-4;
+    }
+
+    .form .form-field-container {
+      .cb-input,
+      .cb-select-choice {
+        &__label {
+          @apply cds-mb-2;
+        }
+      }
+    }
+  }
+  &__modalr {
+    .cb-modal__box__header {
+      height: 60px
+    }
+
+    .cb-modal__box--heavy {
+      @apply cds-h-full;
+    }
+
+    .cb-modal__box__content-frame{
+      @apply cds-max-h-full cds-p-8 cds-m-0;
+
+      .cb-input,
+      .cb-select-choice {
+        &__label {
+          @apply cds-mb-2;
+        }
+      }
+    }
+
+    &-form {
+      .form .form-field-container.form-width-first-half.addInfo__durType-field {
+        @apply cds-pr-6 cds-pb-4;
+      }
+      .form .form-field-container.form-width-full.addInfo__minVal-field {
+        @apply cds-pr-6 cds-mb-4;
+      }
+    }
+    &-btn-wrapper {
+      @apply cds-flex cds-justify-between cds-gap-lg1 cds-mt-1;
+    }
+    &-btns-prime {
+      @apply cds-flex cds-justify-end cds-gap-lg1;
+    }
+  }
+  &__container {
+    @apply cds-container;
+  }
+
+  &__insured,
+  &__limits,
+  &__additional-fields,
+  &__deductibles {
+    &-title {
+      @apply cds-font-bold cds-font-lato cds-text-mobile-headline-6-medium cds-pb-5;
+
+      &-wrapper {
+        @apply cds-flex cds-justify-between;
+
+        .cb-select-choice {
+          @apply cds-w-3/12;
+        }
+      }
+
+      &-description {
+        @apply cds-mb-2;
+      }
+    }
+
+    &-form {
+      &-row {
+        @apply cds-flex cds-gap-lg1;
+
+        .cb-input,
+        .cb-select-choice {
+          @apply cds-pb-lg1;
+
+          &__label {
+            @apply cds-mb-2;
+          }
+          &__custom-select {
+            @apply cds-h-12;
+            border-bottom: 1px solid #afafaf;
+          }
+        }
+      }
+    }
+
+    &-wrapper {
+      .p-accordion {
+        .p-accordion-tab {
+          @apply cds-shadow-none;
+
+          .p-accordion-toggle-icon {
+            @apply cds-ml-0;
+          }
+        }
+
+        .p-element:last-of-type .p-accordion-tab {
+          @apply cds-border-neutral-200 cds-border-b-1 cds-border-solid;
+        }
+
+        .p-accordion-header .p-accordion-header-link {
+          @apply cds-pl-0 cds-bg-white;
+
+          .p-accordion-header-text {
+            @apply cds-font-bold cds-font-lato cds-text-mobile-headline-6-medium;
+          }
+        }
+
+        .p-accordion-content {
+          @apply cds-p-0 cds-pt-4;
+        }
+
+        .p-accordion-header:not(.p-highlight):not(.p-disabled):hover
+          .p-accordion-header-link {
+          @apply cds-bg-white cds-border-s-white;
+        }
+
+        .p-accordion-tab:not(.p-accordion-tab-active)
+          .p-accordion-header-link:focus {
+          @apply cds-bg-white;
+        }
+      }
+    }
+  }
+
+  &__sub-coverages {
+    &-form {
+      &-title {
+        @apply cds-font-bold cds-font-lato cds-text-mobile-headline-6-medium cds-pb-5;
+
+        &-wrapper {
+          @apply cds-flex cds-justify-between;
+        }
+      }
+
+      &-group {
+        .cb-input,
+        .cb-select-choice {
+          @apply cds-pb-lg1;
+
+          &__label {
+            @apply cds-mb-2;
+          }
+        }
+      }
+
+      &-array {
+        @apply cds-pt-lg1;
+      }
+
+      &-action-button {
+        @apply cds-py-lg1 cds-mb-lg1 cds-border-solid cds-border-b-1 cds-border-neutral-200;
+
+        button {
+          @apply cds-no-underline cds-pl-0;
+        }
+
+        button:active,
+        button:focus {
+          @apply cds-border-none;
+        }
+      }
+
+      &-icons {
+        @apply cds-flex cds-gap-lg1 cds-cursor-pointer;
+      }
+
+      &-option {
+        @apply cds-placeholder-black;
+        &:disabled {
+          @apply cds-placeholder-secondary-500;
+        }
+      }
+    }
+  }
+
+  &__footer-buttons {
+    @apply cds-flex cds-justify-between cds-items-center cds-no-underline;
+
+    &--right {
+      @apply cds-flex;
+
+      .cb-button {
+        @apply cds-mx-2;
+      }
+    }
+
+    &--left {
+      .cb-button {
+        @apply cds-pl-0;
+      }
+    }
+  }
+
+  &__modal-button-wrapper {
+    @apply cds-flex cds-justify-end cds-mt-lg1;
+
+    .cb-button:first-of-type {
+      @apply cds-mr-lg1;
+    }
+  }
+
+  &__form-field {
+    @apply cds-flex cds-flex-col;
+  }
+
+  &__error-message-container {
+    @apply cds-flex cds-order-1;
+  }
+}

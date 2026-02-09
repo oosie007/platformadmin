@@ -1,0 +1,20 @@
+/* Importing the styles from Material */
+@import '~@angular/material/prebuilt-themes/indigo-pink.css';
+.stepped-progression {
+  .cb-progress-tracker {
+    &-container-vertical {
+      @apply cds-bg-neutral-100 cds-grid cds-grid-cols-4 cds-gap-lg1;
+
+      & .cb-progress-tracker {
+        @apply cds-col-start-1 cds-col-end-2 cds-bg-white cds-p-lg1 cds-border-2 cds-border-solid cds-border-b-gray-200;
+      }
+
+      .content {
+        @apply cds-w-full cds-col-start-2 cds-col-end-5 cds-bg-white cds-p-lg1 cds-border-2 cds-border-solid cds-border-b-gray-200;
+      }
+    }
+  }
+  .sub-steps-hide {
+    display: none;
+  }
+}

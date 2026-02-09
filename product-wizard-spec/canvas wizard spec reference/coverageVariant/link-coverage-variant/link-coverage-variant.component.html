@@ -1,0 +1,19 @@
+<!-- 
+<div contentAboveTable class="incentives__container__title">
+  {{ labels?.header }}
+</div> -->
+<div>
+ 
+  <canvas-entity-list
+  [context]="context"
+  [fetchTableData]="fetchTableData"
+  [emitSearchFilterOnCommand]="true"
+  [filterFieldFormData]="filterFieldFromData"
+  (radioSelectionValue)="onSelected($event)"
+  [footerActions]="footerActions"
+  (emitSaveChanges)="saveTableData()"
+  [showFooter]="true"
+  >
+
+</canvas-entity-list>
+</div>

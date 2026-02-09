@@ -1,0 +1,53 @@
+.insured-type-selection {
+  &__container {
+    @apply cds-container;
+  }
+
+  &__wrapper {
+    @apply cds-mb-lg2 cds-pb-lg2 cds-border-solid cds-border-b-1 cds-border-neutral-200;
+  }
+
+  &__header {
+    @apply cds-text-base cds-font-semibold cds-font-lato cds-py-2;
+  }
+
+  &__button-group {
+    @apply cds-pt-2 cds-grid cds-grid-cols-3 cds-gap-lg1 cds-mt-4 cds-no-underline;
+
+    .cb-button {
+      @apply cds-flex cds-py-6 cds-justify-start cds-w-full cds-pl-lg1 cds-whitespace-nowrap;
+      &:disabled, &:hover, &:focus {
+        @apply cds-py-6;
+      }
+    }
+
+    cb-icon {
+      @apply cds-pr-2;
+    }
+  }
+
+  &__button-inactive {
+
+    .cb-button,
+    .cb-button:hover,
+    .cb-button:focus {
+      background-color: #f4f4f4;
+      color: #afafaf;
+      @apply cds-border-solid cds-border-2 cds-border-neutral-200;
+    }
+  }
+
+  &__button-active {
+    .cb-button {
+      @apply cds-border-solid cds-border-2 cds-border-neutral-800;
+    }
+  }
+
+  &__modal-button-wrapper {
+    @apply cds-flex cds-justify-end cds-mt-lg1;
+
+    .cb-button:first-of-type {
+      @apply cds-mr-lg1;
+    }
+  }
+}

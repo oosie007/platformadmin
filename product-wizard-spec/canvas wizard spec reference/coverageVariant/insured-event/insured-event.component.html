@@ -1,0 +1,299 @@
+<div class="insured-event__container">
+  <form [formGroup]="insuredEventForm">
+
+    <div class="insured-event__choice" cbSelectChoice label="Policy holder type"
+      styleVariant="default">
+      <select [required]="true" formControlName="policyHolderType" placeholder="Define policy holder type">
+        <option *ngFor="let type of policyHolderOptions | inputUnselect" [ngValue]="type.description">
+          {{ type.description }}
+        </option>
+      </select>
+    </div>
+    <div class="insured-event__error-message-container" *ngIf="policyHolderType.errors && (policyHolderType?.['dirty'] || policyHolderType?.['touched'])">
+      <div *ngIf="policyHolderType.errors['required']">
+        <div class="error-text-container">
+          <cb-icon iconKey="utility-error-stroke" iconColor="error-shade" [iconSize]="cbIconSize.REGULAR" [addPointerClass]="false"></cb-icon>
+          <span class="error-text-container__error-text">Select policy holder type </span>
+        </div>
+      </div>
+    </div>
+    <div class="insured-event__main-insured-select" [cbSelectMultiple]="selectMultipleInsured" [errorMessage]="
+      eventType.invalid && (eventType.dirty || eventType.touched)
+        ? 'Required field'
+        : null
+      ">
+      <label class="insured-event__main-insured-label">Event Type</label>
+      <p-multiSelect #selectMultipleInsured
+                     [selectAll]="selectAllInsured"
+                     [options]="insuredEventRefData"
+                     optionLabel="description"
+                     placeholder="Define Insured Event Type"
+                     inputId="#selectMultipleInsured"
+                     formControlName="eventType"
+                     (onChange)="onMultiSelectChange($event, insuredFormTypes.EVENTTYPE)"
+                     (onSelectAllChange)="onMultiSelectSelectAllChange($event, insuredFormTypes.EVENTTYPE)"
+                     [readonly]="disableEdit">
+      </p-multiSelect>
+    </div>
+    <div class="insured-event__main-insured-chips-container" *ngIf="eventType?.value?.length > 0">
+      <p-chips fieldVariant="stroke"
+               class="insured-event__main-insured-chips"
+               field="description"
+               formControlName="eventTypeChipControl"
+               [disabled]="disableEdit"
+               (onRemove)="onChipRemove($event, insuredFormTypes.EVENTTYPE)">
+      </p-chips>
+      <button cbButton
+              label="Clear all selection"
+              [disabled]="disableEdit || disableClrSelection"
+              variant="primary"
+              (click)="clearSelection(insuredFormTypes.EVENTTYPE)">
+      </button>
+    </div>
+
+    <div class="insured-event__accordions-wrapper" *ngIf="eventFormArray && eventFormArray.length > 0">
+      <p-accordion [multiple]="true" [activeIndex]="[0]">
+        <ng-container formArrayName="eventsForm" *ngFor="let group of eventFormArray.controls; let i = index">
+          <p-accordionTab [formGroupName]="i">
+            <ng-template pTemplate="header">
+              <input type="hidden"
+                     formControlName="insuredEventId"
+                     [ngModel]="selectedEventTypes[i].description"
+                     [disabled]="disableEdit" />
+              <div class="insured-event__accordions-title">
+                {{ selectedEventTypes[i].description }}
+              </div>
+            </ng-template>
+            <ng-template pTemplate="body">
+              <div class="insured-event__accordions-form">
+                <div class="insured-event__accordions-form-row">
+                  <div cbInput
+                       label="Minimum count"
+                       styleVariant="default"
+                       helpText=""
+                       [errorMessage]="_validateMinCount(selectedEventTypes[i].description, i)">
+                    <input placeholder="Minimum count"
+                           type="number"
+                           pattern=".*" 
+                           formControlName="minQuantity"
+                           [readOnly]="disableEdit"
+                           [disabled]="disableEdit"
+                           min="0"/>
+                  </div>
+
+                  <div cbInput
+                       label="Maximum count"
+                       styleVariant="default"
+                       helpText=""
+                       [errorMessage]="_validateMaxCount(selectedEventTypes[i].description, i)">
+                    <input placeholder="Maximum count"
+                           [required]="false"
+                           type="number"
+                           pattern=".*" 
+                           formControlName="maxQuantity"
+                           [readOnly]="disableEdit"
+                           [disabled]="disableEdit" />
+                  </div>
+                </div>
+
+                <div class="insured-event__custom-attributes-wrapper">
+                  <div class="insured-event__tooltip" *ngIf="getAttributesFormArray(i).length > 0">
+                    <div class="insured-event__custom-attributes-title">
+                      Custom attributes
+                    </div>
+                    <div class="insured-event__tooltiptext">
+                      <cb-tooltip
+                        explanationText="Unique characteristics/attributes of the insured which further define the insured, product eligibility, & pricing."
+                        styleVariant="stroke" direction="above-right">
+                        <cb-icon iconKey="utility-tooltip-stroke"></cb-icon>
+                      </cb-tooltip>
+                    </div>
+                  </div>
+                  <div formGroupName="customAttributesForm">
+                    <div formArrayName="attributes" class="insured-event__custom-attributes-form-array" *ngFor="
+                        let attribute of getAttributesFormArray(i).controls;
+                        let j = index
+                      ">
+                      <div [formGroupName]="j" class="insured-event__custom-attributes-form-group">
+                        <div class="insured-event__custom-attributes-form-title-wrapper">
+                          <div class="insured-event__custom-attributes-form-title">
+                            {{ 'Attribute ' + (j + 1) }}
+                          </div>
+                          <cb-icon iconKey="utility-trash-fill" iconColor="error-saturated"
+                            [iconSize]="cbIconSize.LARGE" [addPointerClass]="true" *ngIf="
+                              getAttributesFormArray(i).length > 0 &&
+                              !disableDel[i][j]
+                            " (click)="enableDeleteConfirmation(i, j)"></cb-icon>
+                        </div>
+                        <div class="insured-event__custom-attributes-form-row">
+                          <div cbCheckbox label="Required">
+                            <input type="checkbox" formControlName="required" [readOnly]="!disableEdit" />
+                          </div>
+                          <div cbCheckbox label="Do not allow duplication">
+                            <input type="checkbox" formControlName="allowDuplication" [readOnly]="!disableEdit" />
+                          </div>
+                        </div>
+                        <div cbInput label="Attribute name" styleVariant="default"
+                          [errorMessage]="_validateCustAttribute(i, j)">
+                          <input placeholder="Attribute name" type="text" formControlName="name" maxLength="700"
+                            [readOnly]="disableEdit" />
+                        </div>
+                        <div styleVariant="default" placeholder="Data type" class="cb-select-choice">
+                          <div class="insured-event__tooltip">
+                            <label class="cb-input__label">Data type</label>
+                            <div class="insured-event__tooltiptextpa-data">
+                              <cb-tooltip explanationText="Select the type of data" styleVariant="stroke"
+                                direction="above-right">
+                                <cb-icon iconKey="utility-tooltip-stroke"></cb-icon>
+                              </cb-tooltip>
+                            </div>
+                          </div>
+
+                          <select [disabled]="!disableEdit" name="options" id="options" formControlName="dataType"
+                            (change)="onDataTypeChange(attribute)"
+                            class="cb-select-choice__base-select cb-select-choice__custom-select">
+                            <option *ngFor="let type of attributeDataType" [value]="type.description">
+                              {{ type.description }}
+                            </option>
+                          </select>
+                        </div>
+
+                        <div formArrayName="answers" *ngIf="attribute.get('dataType')?.value === 'DROPDOWN'">
+                          <div class="insured-event__custom-attributes-title">DROPDOWN</div>
+                          <div *ngFor="let answer of getAnswersControls(i, j).controls; let k = index"
+                            [formGroupName]="k">
+                            <div class="insured-event__custom-attributes-form-title-wrapper">
+                              <div class="insured-event__custom-attributes-form-title">{{'Answer ' + (k + 1)}}</div>
+                              <cb-icon class="insured-event__custom-attributes-form-group__delete"
+                                       iconKey="utility-trash-fill"
+                                       iconColor="error-saturated"
+                                       [iconSize]="cbIconSize.LARGE"
+                                       [addPointerClass]="true"
+                                       (click)="removeAnswer(getAttribute(i, j), k)"
+                                       [ngClass]="{'disabled': disableEdit}"></cb-icon>
+                            </div>
+                            <div cbInput label="Answer value" styleVariant="default"
+                              [errorMessage]="getDropdownAnswerErrorMessage(answer.get('answerValue'))">
+                              <input formControlName="answerValue" placeholder="Answer Value" type="text" />
+                            </div>
+                            <div cbInput
+                                 label="Answer description"
+                                 styleVariant="default"
+                                 [errorMessage]="getDropdownAnswerErrorMessage(answer.get('answerDescription'))">
+                              <input formControlName="answerDescription" placeholder="Answer Description" type="text" />
+                            </div>
+                          </div>
+                          <button class="insured-event__custom-attributes-answer-title"
+                                  (click)="addAnswer(getAttribute(i, j))"
+                                  [ngClass]="{'disabled': disableEdit}">+ Add fields</button>
+                        </div>
+
+                        <div *ngIf="attribute.get('dataType')?.value === 'FILE'">
+                          <div cbInput
+                               label="Maximum count"
+                               styleVariant="default"
+                               [errorMessage]="attribute.get('maxOccurence')?.invalid && (attribute.get('maxOccurence')?.dirty || attribute.get('maxOccurence')?.touched) ? attribute.get('maxOccurence')?.errors?.['maxlength'] ? 'Data cannot be more than 100' : 'Required field' : null">
+                            <input placeholder="Maximum count" 
+                                   type="number"
+                                   pattern=".*"
+                                   maxLength="2"
+                                   formControlName="maxOccurence" />
+                          </div>
+                          <div class="insured-type__main-insured-select" [cbSelectMultiple]="selectMultipleFiletype">
+                            <label class="insured-type__main-insured-label">File type</label>
+                            <p-multiSelect #selectMultipleFiletype
+                                           [options]="fileTypeList"
+                                           optionLabel="description"
+                                           placeholder="File types"
+                                           formControlName="fileTypes"
+                                           inputId="#selectMultipleFiletype"
+                                           (onSelectAllChange)="onSelectAllFileTypes($event, attribute)"></p-multiSelect>
+                          </div>
+                        </div>
+                        <div cbInput
+                          label="Default value"
+                          styleVariant="default"
+                          *ngIf="!(attribute.get('dataType')?.value === 'DROPDOWN' || attribute.get('dataType')?.value === 'FILE')">
+                          <input
+                              placeholder="Enter default value"
+                              type="text"
+                              formControlName="defaultValue"/>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="insured-event__custom-attributes-form-action-button">
+                      <button cbButton
+                              [label]="eventLabels.addAttributeButtonLabel"
+                              [leftIcon]="'utility-add'"
+                              variant="ghost"
+                              (click)="addAttribute(i)"
+                              [disabled]="disableEdit"></button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ng-template>
+          </p-accordionTab>
+        </ng-container>
+      </p-accordion>
+    </div>
+
+    <div class="insured-event__footer-buttons">
+      <div class="insured-event__footer-buttons--left">
+        <button cbButton
+                [label]="eventLabels.backButtonLabel"
+                [leftIcon]="'utility-arrow-left'"
+                variant="ghost"
+                (click)="previous()"></button>
+      </div>
+      <div class="insured-event__footer-buttons--right">
+        <button cbButton
+                [label]="eventLabels.saveExitButtonLabel"
+                variant="secondary"
+                (click)="saveAndExit()"
+                [disabled]="disableEdit || currVersChange"></button>
+        <button cbButton
+                [label]="eventLabels.saveButtonLabel"
+                variant="primary"
+                (click)="saveAndNext()"
+                *ngIf="!disableEdit || currVersChange"></button>
+        <button cbButton
+                label="Next"
+                variant="primary"
+                (click)="submit()"
+                *ngIf="disableEdit"></button>
+      </div>
+    </div>
+  </form>
+</div>
+<cb-modal [open]="openDeleteModal" (closeEvent)="handleDeleteModal()"
+  title="Do you want to delete the custom attribute?" message="" [hideCloseIcon]="false">
+  <div class="insured-event__modal-button-wrapper">
+    <button cbButton
+            [label]="eventLabels.clearButtonLabel"
+            variant="secondary"
+            (click)="handleDeleteModal()">
+    </button>
+    <button cbButton
+            [label]="eventLabels.confirmButtonLabel"
+            variant="primary"
+            (click)="deleteConfirmation()">
+    </button>
+  </div>
+</cb-modal>
+
+<cb-modal [open]="openDeleteAttributeModal" (closeEvent)="handleDeleteAttributeModal()"
+  title="Do you want to delete the custom attribute option?" message="" [hideCloseIcon]="false">
+  <div class="insured-event__modal-button-wrapper">
+    <button cbButton
+            [label]="eventLabels.clearButtonLabel"
+            variant="secondary"
+            (click)="handleDeleteAttributeModal()">
+    </button>
+    <button cbButton
+            [label]="eventLabels.confirmButtonLabel"
+            variant="primary"
+            (click)="deleteAttributeConfirmation()">
+    </button>
+  </div>
+</cb-modal>

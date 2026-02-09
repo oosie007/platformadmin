@@ -1,0 +1,142 @@
+.event-variant-level {
+  &__container {
+    @apply cds-container;
+  }
+
+  &__insured,
+  &__limits,
+  &__additional-fields,
+  &__deductibles {
+    &-title {
+      @apply cds-font-bold cds-font-lato cds-text-mobile-headline-6-medium cds-uppercase cds-pb-5;
+
+      &-wrapper {
+        @apply cds-flex cds-justify-between;
+
+        .cb-select-choice {
+          @apply cds-w-3/12;
+        }
+      }
+
+      &-description {
+        @apply cds-uppercase cds-mb-2;
+      }
+    }
+
+    &-form {
+      &-row {
+        @apply cds-flex cds-gap-lg1;
+
+        .cb-input,
+        .cb-select-choice {
+          @apply cds-pb-2;
+
+          &__label {
+            @apply cds-mb-2;
+          }
+        }
+       
+      }
+    }
+
+    &-wrapper {
+      .p-accordion {
+        .p-accordion-tab {
+          @apply cds-shadow-none;
+
+          .p-accordion-toggle-icon {
+            @apply cds-ml-0;
+          }
+        }
+
+        .p-element:last-of-type .p-accordion-tab {
+          @apply cds-border-neutral-200 cds-border-b-1 cds-border-solid;
+        }
+
+        .p-accordion-header .p-accordion-header-link {
+          @apply cds-pl-0 cds-bg-white;
+
+          .p-accordion-header-text {
+            @apply cds-font-bold cds-font-lato cds-text-mobile-headline-6-medium;
+          }
+        }
+
+        .p-accordion-content {
+          @apply cds-p-0 cds-pt-4;
+        }
+
+        .p-accordion-header:not(.p-highlight):not(.p-disabled):hover .p-accordion-header-link {
+          @apply cds-bg-white cds-border-s-white;
+        }
+
+        .p-accordion-tab:not(.p-accordion-tab-active) .p-accordion-header-link:focus {
+          @apply cds-bg-white;
+        }
+      }
+    }
+  }
+
+  &__sub-coverages {
+    &-form {
+      &-title {
+        @apply cds-font-bold cds-font-lato cds-text-mobile-headline-6-medium cds-pb-5 cds-uppercase;
+
+        &-wrapper {
+          @apply cds-flex cds-justify-between;
+        }
+      }
+
+      &-group {
+
+        .cb-input,
+        .cb-select-choice {
+          @apply cds-pb-lg1;
+
+          &__label {
+            @apply cds-mb-2;
+          }
+        }
+      }
+
+      &-array {
+        @apply cds-pt-lg1;
+      }
+
+      &-action-button {
+        @apply cds-py-lg1 cds-mb-lg1 cds-border-solid cds-border-b-1 cds-border-neutral-200;
+
+        button {
+          @apply cds-no-underline cds-pl-0;
+        }
+
+        button:active,
+        button:focus {
+          @apply cds-border-none;
+        }
+      }
+
+      &-icons {
+        @apply cds-flex cds-gap-lg1;
+      }
+    }
+  }
+
+
+  &__footer-buttons {
+    @apply cds-flex cds-justify-between cds-items-center cds-no-underline;
+
+    &--right {
+      @apply cds-flex;
+
+      .cb-button {
+        @apply cds-mx-2;
+      }
+    }
+
+    &--left {
+      .cb-button {
+        @apply cds-pl-0;
+      }
+    }
+  }
+}

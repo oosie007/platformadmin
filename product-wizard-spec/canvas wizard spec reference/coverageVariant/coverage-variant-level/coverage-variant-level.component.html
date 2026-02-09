@@ -1,0 +1,135 @@
+<div class="mi-variant-level__container">
+  <div class="mi-variant-level__insured-container">
+    <div class="mi-variant-level__insured-title-wrapper">
+      <div class="mi-variant-level__insured-title-container">
+        <div class="mi-variant-level__insured-title-description" *ngIf="!isObject">
+          1 of 1 Coverage variant levels
+        </div>
+        <div class="mi-variant-level__insured-title-description" *ngIf="isObject">
+          {{ objectTypeToRenderIndex }} of
+          {{ selectedObjectTypes }} Coverage variant levels
+        </div>
+
+        <div class="mi-variant-level__insured-title">
+          Coverage variant levels by insured type
+        </div>
+      </div>
+    </div>
+    <div class="mi-variant-level__limits-title">
+      Define cumulative limits
+    </div>
+    <form [formGroup]="limitsForm">
+      <div class="mi-variant-level__limits-form">
+        <div class="mi-variant-level__limits-form-row">
+          <div cbSelectChoice label="Cumulative limit type" styleVariant="default" placeholder="Aggregate limit type">
+            <select [disabled]="false" name="options" id="options" (ngModelChange)="onSelectionChange()"
+              formControlName="cumulativeLimitType">
+              <option *ngFor="let type of (aggregateType | inputUnselect)" [ngValue]="type.code">
+                {{ type.description }}
+              </option>
+            </select>
+          </div>
+
+          <div class="cds-w-full">
+            <div cbInput label="Cumulative value" styleVariant="default" helpText=""
+              *ngIf="aggregateMaxLimitsValue !== 'PERCENTAGE'">
+              <input placeholder="Aggregate value" type="text" pattern=".*" maxLength="50"
+                (ngModelChange)="selectedAmount()" formControlName="cumulativeamountValue" />
+            </div>
+            <div class="mi-variant-level__error-message-container"
+              *ngIf="(aggregateMaxLimitsValue ==='AMT') &&field['cumulativeamountValue'].errors && (field['cumulativeamountValue']?.['dirty'] || field['cumulativeamountValue']?.['touched'])">
+              <div *ngIf="field['cumulativeamountValue'].errors['required']">
+                <div class="error-text-container">
+                  <cb-icon iconKey="utility-error-stroke" iconColor="error-shade" [iconSize]="cbIconSize.REGULAR"
+                    [addPointerClass]="false"></cb-icon>
+                  <span class="error-text-container__error-text">Cumulative limit value is required</span>
+                </div>
+              </div>
+              <div *ngIf="field['cumulativeamountValue'].errors['maxlength']">
+                <div class="error-text-container">
+                  <cb-icon iconKey="utility-error-stroke" iconColor="error-shade" [iconSize]="cbIconSize.REGULAR"
+                    [addPointerClass]="false"></cb-icon>
+                  <span class="error-text-container__error-text">Max length is 50</span>
+                </div>
+              </div>
+              <div *ngIf="field['cumulativeamountValue'].errors['min']">
+                <div class="error-text-container">
+                  <cb-icon iconKey="utility-error-stroke" iconColor="error-shade" [iconSize]="cbIconSize.REGULAR"
+                    [addPointerClass]="false"></cb-icon>
+                  <span class="error-text-container__error-text">Cumulative amount should be greater than 1</span>
+                </div>
+              </div>
+            </div>
+            <div cbInput label="Percentage" styleVariant="default" helpText=""
+              *ngIf="aggregateMaxLimitsValue === 'PERCENTAGE'">
+              <input placeholder="Percentage of" type="text" pattern=".*" maxLength="3" [max]="100"
+                (ngModelChange)="selectedPercentage()" formControlName="cumulativeMaxPercentage" />
+            </div>
+            <div class="mi-variant-level__error-message-container"
+              *ngIf="(aggregateMaxLimitsValue ==='PERCENTAGE') &&field['cumulativeMaxPercentage'].errors && (field['cumulativeMaxPercentage']?.['dirty'] || field['cumulativeMaxPercentage']?.['touched'])">
+              <div *ngIf="field['cumulativeMaxPercentage'].errors['required']">
+                <div class="error-text-container">
+                  <cb-icon iconKey="utility-error-stroke" iconColor="error-shade" [iconSize]="cbIconSize.REGULAR"
+                    [addPointerClass]="false"></cb-icon>
+                  <span class="error-text-container__error-text">Cumulative limit value is required</span>
+                </div>
+              </div>
+              <div *ngIf="field['cumulativeMaxPercentage'].errors['max']">
+                <div class="error-text-container">
+                  <cb-icon iconKey="utility-error-stroke" iconColor="error-shade" [iconSize]="cbIconSize.REGULAR"
+                    [addPointerClass]="false"></cb-icon>
+                  <span class="error-text-container__error-text">Max value is 100</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mi-variant-level__limits-form-row" *ngIf="isLimits">
+          <div class="cds-w-full">
+            <div cbSelectChoice label="Percentage" styleVariant="default" placeholder="Select coverage variant">
+              <select [disabled]="isLimits" name="options" id="options" (ngModelChange)="selectedvariant()"
+                formControlName="cumulativePercentage">
+                <option *ngFor="let type of (coverageList | inputUnselect)" [ngValue]="type.coverageVariantId">
+                  {{ type.coverageVariantId }}
+                </option>
+              </select>
+            </div>
+            <div class="mi-variant-level__error-message-container"
+              *ngIf="(aggregateMaxLimitsValue ==='PERCENTAGE') && field['cumulativePercentage'].errors && (field['cumulativePercentage']?.['dirty'] || field['cumulativePercentage']?.['touched'])">
+              <div *ngIf="field['cumulativePercentage'].errors['required']">
+                <div class="error-text-container">
+                  <cb-icon iconKey="utility-error-stroke" iconColor="error-shade" [iconSize]="cbIconSize.REGULAR"
+                    [addPointerClass]="false"></cb-icon>
+                  <span class="error-text-container__error-text">Cumulative percentage is required</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div></div>
+        </div>
+      </div>
+    </form>
+
+    <div class="mi-variant-level__limits-div">
+      <canvas-table [data]="insureds" [options]="options"> </canvas-table>
+      <div class="mi-variant-level__insured-title-text-wrapper">
+        <cb-icon iconKey="utility-error-stroke" [iconSize]="cbIconSize.LARGE" [addPointerClass]="true"></cb-icon>
+        <div class="mi-variant-level__insured-title-text">
+          Note that ALL insured types has to be completed to successfully create a
+          coverage variant level
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="mi-variant-level__footer-buttons">
+    <div class="mi-variant-level__footer-buttons--left">
+      <button cbButton label="Back" [leftIcon]="'utility-arrow-left'" variant="ghost" (click)="previous()"></button>
+    </div>
+    <div class="mi-variant-level__footer-buttons--right">
+      <button cbButton label="Save to draft" variant="secondary" [colorTheme]="colorTheme"
+        (click)="saveandExit()"></button>
+      <button cbButton [label]="nextButtonLabel" variant="primary" [colorTheme]="colorTheme" (click)="next()"></button>
+    </div>
+  </div>
+</div>

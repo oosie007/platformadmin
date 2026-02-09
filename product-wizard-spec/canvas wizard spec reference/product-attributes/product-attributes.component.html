@@ -1,0 +1,215 @@
+<p-toast position="top-right" key="tr"></p-toast>
+<div class="product-attributes__container">
+  <div class="product-attributes__head">
+    <div  class="product-attributes__title">{{ labels.title }}
+      <div class="product-attributes__tooltiptext">
+        <cb-tooltip *ngIf="showExistingAttributeList"
+          explanationText="The Product attributes overview lists out all attributes which have been set up in the admin console to be used in the product set up."
+          styleVariant="stroke"
+          [colorTheme]="cbToolTipColorTheme"
+          direction="above-right"
+          [disabled]="disableFeature"
+        >
+          <cb-icon iconKey="utility-tooltip-stroke"></cb-icon>
+        </cb-tooltip>
+      </div>
+    </div>
+    <div class="product-attributes__head--button">
+      <button
+        cbButton
+        [label]="labels.existingAttributeBtnLabel"
+        variant="secondary"
+        leftIcon="utility-add"
+        [colorTheme]="colorTheme"
+        (click)="onExistingAttribute()"
+        [disabled]="isFinalStatus || disableFeature"
+        *ngIf="!showExistingAttributeList"
+      ></button>
+      <button
+        cbButton
+        [label]="labels.createAttributeBtnLabel"
+        variant="primary"
+        leftIcon="utility-document-edit-stroke"
+        [colorTheme]="colorTheme"
+        (click)="onCreateAttribute()"
+        [disabled]="isFinalStatus || disableFeature"
+        *ngIf="!showExistingAttributeList"
+      ></button>
+    </div>
+  </div>
+  <div class="product-attributes__search">
+    <div cbSearchInput styleVariant="default" [colorTheme]="colorTheme" *ngIf="!showExistingAttributeList">
+      <div class="cb-search-input__wrapper">
+        <span class="p-inputgroup-addon">
+          <cb-icon
+            iconKey="utility-search"
+            [iconColor]="'neutral-400'"
+          ></cb-icon>
+        </span>
+        <p-autoComplete
+          [(ngModel)]="searchedProductAttributes"
+          [suggestions]="attributes"
+          [showClear]="true"
+          field="attrName"
+          (completeMethod)="searchProductAttribute($event)"
+          [placeholder]="labels.searchPlaceholder"
+          [disabled]="disableFeature"
+          (onClear)="onSearchClear($event)"
+        >
+        </p-autoComplete>
+      </div>
+    </div>
+    <div cbSearchInput styleVariant="default" [colorTheme]="colorTheme" *ngIf="showExistingAttributeList">
+      <div class="cb-search-input__wrapper">
+        <span class="p-inputgroup-addon">
+          <cb-icon
+            iconKey="utility-search"
+            [iconColor]="'neutral-400'"
+          ></cb-icon>
+        </span>
+        <p-autoComplete
+          [(ngModel)]="searchedPredefineProductAttributes"
+          [suggestions]="existingAttributeList"
+          [showClear]="true"
+          field="attributeId"
+          (completeMethod)="searchPredefineProductAttribute($event)"
+          [placeholder]="labels.searchPredefinePlaceholder"
+          [disabled]="disableFeature"
+          (onClear)="onSearchClear($event)"
+        >
+        </p-autoComplete>
+      </div>
+    </div>
+  </div>
+
+  <div class="product-attributes__grid" *ngIf="!showExistingAttributeList">
+    <canvas-table [data]="attributes" [options]="options"></canvas-table>
+  </div>
+
+  <div class="product-attributes__grid" *ngIf="showExistingAttributeList">
+    <canvas-table [data]="existingAttributeList"
+                  [options]="listOptions"
+                  (checkboxChecked)="onRowSelected($event)">
+    </canvas-table>
+  </div>
+
+  <canvas-sidebar-form
+    *ngIf="showDrawer"
+    [(visible)]="showDrawer"
+    [title]="isEdit ? labels.editDrawerTitle : labels.createDrawerTitle"
+    [schema]="attributeSchema"
+    [model]="attributeModel"
+    [actionsInFooter]="true"
+    (submitted)="saveProductAttribute($event)"
+    [submitButtonLabel]="labels.submitBtnLabel"
+    [cancelButtonLabel]="labels.cancelBtnLabel"
+    (cancelled)="toggleDrawer($event)"
+  ></canvas-sidebar-form>
+
+  <cb-modal
+    [open]="openModal"
+    (closeEvent)="handleModal()"
+    title=""
+    description="This product attribute is currently linked to the rating sheet. To proceed with deleting it, please update the rating screen by removing this attribute first."
+    [hideCloseIcon]="false"
+  >
+    <div class="product-attributes__modal-button-wrapper">
+      <button
+        cbButton
+        label="OK"
+        variant="primary"
+        [colorTheme]="colorTheme"
+        (click)="onConfirm()"
+      ></button>
+    </div>
+  </cb-modal>
+
+  <cb-modal
+    [open]="openDeleteModal"
+    (closeEvent)="handleDeleteModal()"
+    title="Do you want to delete the attribute?"
+    description=""
+    [hideCloseIcon]="false"
+  >
+    <div class="product-attributes__modal-button-wrapper">
+      <button cbButton
+                label="Cancel"
+                variant="ghost"
+                (click)="handleDeleteModal()">
+        </button>
+        <button cbButton
+                label="Delete"
+                variant="danger"
+                [colorTheme]="'default'"
+                (click)="onDeleteAttribute()">
+        </button>
+    </div>
+  </cb-modal>
+
+  <cb-modal
+    [open]="openDiscardModal"
+    (closeEvent)="handleDiscardModal()"
+    title="Discard & exit"
+    description="Are you sure you would want to discard any selection made? All changes made would be lost."
+    
+    [hideCloseIcon]="false"
+  >
+    <div class="product-attributes__modal-button-wrapper">
+      <button cbButton
+                label="Cancel"
+                variant="secondary"
+                (click)="handleDiscardModal()">
+        </button>
+        <button cbButton
+                label="Exit"
+                variant="primary"
+                [colorTheme]="'default'"
+                (click)="discardAttributeAndExit()">
+        </button>
+    </div>
+  </cb-modal>
+</div>
+
+<div class="product-attributes__footer-buttons">
+  <ng-container *ngIf="!showExistingAttributeList">
+    <div class="product-attributes__footer-buttons--left">
+      <button
+        cbButton
+        [label]="labels.backBtnLabel"
+        [leftIcon]="'utility-arrow-left'"
+        variant="ghost"
+        (click)="previous()"
+      ></button>
+    </div>
+    <div class="product-attributes__footer-buttons--right">
+      <button
+        cbButton
+        [label]="labels.nextBtnLabel"
+        variant="primary"
+        [colorTheme]="colorTheme"
+        (click)="next()"
+      ></button>
+    </div>
+  </ng-container>
+  <ng-container *ngIf="showExistingAttributeList">
+    <div class="product-attributes__footer-buttons--left">
+      <button
+        cbButton
+        [label]="labels.predefineAttributeDiscardLabel"
+        [leftIcon]="'utility-arrow-left'"
+        variant="ghost"
+        (click)="confirmDiscardAttributeAndExit()"
+      ></button>
+    </div>
+    <div class="product-attributes__footer-buttons--right">
+      <button
+      cbButton
+      [label]="labels.predefineAttributeAddLabel"
+      variant="primary"
+      [colorTheme]="colorTheme"
+      leftIcon="utility-add"
+      (click)="addPredefineAttribute()"
+    ></button>
+    </div>
+  </ng-container>
+</div>

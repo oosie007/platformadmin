@@ -1,0 +1,49 @@
+<div class="ratinglib__container">
+    <div class="ratinglib__title">Rating Factor Library</div>
+    <!-- <div class="ratinglib__search-create">
+      <div cbSearchInput styleVariant="default" colorTheme="default">
+        <div class="cb-search-input__wrapper">
+          <span class="p-inputgroup-addon">
+            <cb-icon iconKey="utility-search" [iconColor]="'neutral-400'"></cb-icon>
+          </span>
+          <p-autoComplete
+            field="name"
+            placeholder="Search Questions"
+          >
+          </p-autoComplete>
+        </div>
+      </div>
+      <button
+        cbButton
+        label="Create"
+        variant="primary"
+        leftIcon="utility-document-edit-stroke"
+        [colorTheme]="colorTheme"
+        (click)="createQuestion()"
+      ></button>
+    </div> -->
+  
+    <canvas-table
+      [data]="globalRatingFactorsList"
+      [options]="options"
+      [columns]="columnDefinitions"
+      [showRowSelector]="true"
+      [showSearch]="true"
+     
+     
+    ></canvas-table>
+  </div>
+  
+  <div class="ratinglib__footer-buttons">
+    <div class="ratinglib__footer-buttons--left">
+      <button
+        cbButton
+        label="Back to Rating"
+        [leftIcon]="'utility-arrow-left'"
+        variant="ghost"
+        (click)="previous()"
+      ></button>
+    </div>
+   
+  </div>
+  

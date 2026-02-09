@@ -1,0 +1,28 @@
+@import 'primeng/resources/themes/lara-light-blue/theme.css';
+@import 'primeng/resources/primeng.min.css';
+@import 'primeicons/primeicons.css';
+.state-configuration {
+  &__title {
+    @apply cds-font-bold cds-text-3xl cds-pb-5;
+  }
+  .cb-table--fill .p-datatable-thead > tr > th {
+    white-space: normal;
+  }
+  .footer-buttons {
+    @apply cds-flex cds-justify-between cds-items-center cds-pt-12 cds-no-underline;
+
+    &--right {
+      @apply cds-flex;
+
+      .cb-button {
+        @apply cds-mx-2;
+      }
+    }
+
+    &--left {
+      .cb-button {
+        @apply cds-pl-0;
+      }
+    }
+  }
+}

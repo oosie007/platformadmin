@@ -1,0 +1,127 @@
+@import '@chubb/ui-components/styles/cb-accordion';
+.coverage-factors {
+  &__container {
+    @apply cds-container;
+  }
+
+  &__title {
+    @apply cds-m-7 cds-text-left cds-text-2xl cds-font-bold;
+  }
+
+  &__row {
+    @apply cds-flex cds-gap-4 cds-max-w-xl cds-mt-5 cds-mb-4;
+    .cb-input {
+      @apply cds-w-[20%];
+    }
+  }
+
+  &-error-message {
+    @apply cds-text-red-500;
+  }
+
+  &__accordians {
+    @apply cds-mt-8 cds-mb-4;
+
+    .p-accordion {
+      .p-accordion-header {
+        .p-accordion-header-link {
+          span.p-accordion-header-text {
+            @apply cds-text-[21px] cds-font-semibold;
+          }
+        }
+      }
+      .p-accordion-content {
+        @apply cds-p-5;
+      }
+    }
+
+    .cb-table--fill .p-datatable-thead > tr > th {
+      @apply cds-w-[10%];
+    }
+
+    .cb-table .p-checkbox {
+      @apply cds-border-0;
+    }
+  }
+
+  &__table {
+    @apply cds-mt-5;
+    &-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.5); /* semi-transparent */
+      z-index: 10;
+      cursor: not-allowed;
+    }
+  }
+
+  &__footer-buttons {
+    @apply cds-flex cds-justify-between cds-items-center cds-pt-12 cds-no-underline;
+    border-top: 1px solid rgb(229 231 235 / var(--tw-border-opacity));
+    --tw-bg-opacity: 1;
+
+    &--right {
+      @apply cds-flex;
+
+      .cb-button {
+        @apply cds-mx-2;
+      }
+    }
+
+    &--left {
+      .cb-button {
+        @apply cds-pl-0;
+      }
+    }
+  }
+}
+
+.cb-button.cb-button--ghost,
+.cb-button.cb-button--ghost[disabled] {
+  @apply cds-w-[20px] cds-p-0;
+  // width: 20px;
+  // padding: 0;
+}
+
+.cb-accordion {
+  .p-accordion {
+    .p-accordion-header:not(.p-disabled) {
+      .p-accordion-header-link--default-color-theme {
+        border-top-color: rgb(229 231 235 / var(--tw-border-opacity));
+        --tw-bg-opacity: 1;
+        outline: none;
+      }
+
+      .p-accordion-header-link:focus {
+        outline: none;
+        background-color: rgb(255 255 255 / var(--tw-bg-opacity));
+      }
+
+      .p-accordion-header-link:hover {
+        background-color: rgb(255 255 255 / var(--tw-bg-opacity));
+        border-top-color: rgb(229 231 235 / var(--tw-border-opacity));
+        --tw-bg-opacity: 1;
+        outline: none;
+      }
+    }
+  }
+
+  .p-component--default-color-theme {
+    border-bottom: none;
+  }
+}
+
+.cb-accordion--marketing-header-style.cb-accordion--medium-padding,
+.cb-accordion--basic-header-style.cb-accordion--medium-padding {
+  .p-accordion {
+    .p-accordion-header {
+      .p-accordion-header-link {
+        padding-top: 1.5rem;
+        padding-bottom: 1.5rem;
+      }
+    }
+  }
+}

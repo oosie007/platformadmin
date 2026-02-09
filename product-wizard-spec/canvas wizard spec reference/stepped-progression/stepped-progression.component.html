@@ -1,0 +1,75 @@
+<div class="stepped-progression">
+  <div class="stepped-progression__progress-tracker">
+    <div class="stepped-progression__progress-tracker--steps">
+      <div class="cb-progress-tracker-container-{{ orientation }}">
+        <div [cbProgressTracker]="progressTracker">
+          <mat-stepper
+            #progressTracker
+            orientation="vertical"
+            [disableRipple]="true"
+            (selectedIndexChange)="onSelectedStepChange($event)"
+            (click)="onClickEvent($event)"
+          >
+            <ng-container *ngFor="let step of steps; index as i">
+              <ng-container *ngIf="i == 0">
+                <mat-step [completed]="!!this.selectedProductId">
+                  <ng-template matStepLabel> {{ step.label }} </ng-template>
+                  <div
+                    *ngIf="step.subSteps"
+                    [cbSubProgressTracker]="subProgressTracker"
+                  >
+                    <mat-stepper
+                      #subProgressTracker
+                      orientation="vertical"
+                      [disableRipple]="true"
+                      (selectedIndexChange)="onSelectedSubStepChange($event)"
+                    >
+                      <mat-step *ngFor="let subStep of step.subSteps">
+                        <ng-template matStepLabel>
+                          {{ subStep.label }}
+                        </ng-template>
+                      </mat-step>
+                    </mat-stepper>
+                  </div>
+                </mat-step>
+              </ng-container>
+              <ng-container *ngIf="i != 0">
+                <mat-step>
+                  <ng-template matStepLabel> {{ step.label }} </ng-template>
+                  <div
+                    *ngIf="step.subSteps"
+                    [cbSubProgressTracker]="subProgressTracker"
+                  >
+                    <mat-stepper
+                      #subProgressTracker
+                      orientation="vertical"
+                      [disableRipple]="true"
+                      [ngClass]="{
+                        'sub-steps-hide':
+                          step | showCoverageVariantSubSteps : coverageVariantId
+                      }"
+                      (selectedIndexChange)="onSelectedSubStepChange($event)"
+                    >
+                      <mat-step *ngFor="let subStep of step.subSteps">
+                        <ng-template matStepLabel>
+                          {{ subStep.label }}
+                        </ng-template>
+                      </mat-step>
+                    </mat-stepper>
+                  </div>
+                </mat-step>
+              </ng-container>
+            </ng-container>
+          </mat-stepper>
+        </div>
+        <div class="content">
+          <div class="cb-progress-tracker--content">
+            <!--Keep your tracker content here-->
+            <router-outlet></router-outlet>
+            <!--Content ends here-->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

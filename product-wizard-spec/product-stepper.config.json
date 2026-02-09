@@ -1,0 +1,29 @@
+{
+  "labels": {
+    "stateError": "Only US country can access state configuration",
+    "coverageFactorError": "Only insured individual can access coverage factors"
+  },
+  "steps": [
+    { "label": "Product details", "routeOrFunction": "create" },
+    { "label": "Product overview", "routeOrFunction": "update" },
+    { "label": "Availability", "subSteps": [{ "label": "Create availability", "routeOrFunction": "availability" }] },
+    { "label": "Policy configuration", "routeOrFunction": "policyconfiguration" },
+    { "label": "State configuration", "routeOrFunction": "stateconfiguration" },
+    {
+      "label": "Coverage variants",
+      "subSteps": [
+        { "label": "Coverage variant details", "routeOrFunction": "coveragevariant" },
+        { "label": "Insured type", "routeOrFunction": "coveragevariant/insuredType" },
+        { "label": "Coverage factors", "routeOrFunction": "coveragevariant/coverageFactors" },
+        { "label": "Subcoverages", "routeOrFunction": "coveragevariant/sub-coverage" },
+        { "label": "Coverage variant levels", "routeOrFunction": "coveragevariant/coverage-variant-level-overview" },
+        { "label": "Exclusions", "routeOrFunction": "coveragevariant/exclusions" },
+        { "label": "Include fixed coverages", "routeOrFunction": "coveragevariant/inclusions" }
+      ]
+    },
+    { "label": "Product attributes", "routeOrFunction": "product-attributes" },
+    { "label": "Ratings", "routeOrFunction": "ratingfactor" },
+    { "label": "Premium allocation", "routeOrFunction": "premium-allocation" },
+    { "label": "Documents", "routeOrFunction": "documents" }
+  ]
+}

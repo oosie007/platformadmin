@@ -1,0 +1,116 @@
+<div class="availability__container">
+    <form [formGroup]="availabilityForm">
+        <div class="availability__title">Manage availability</div>
+
+
+        <div cbSelectChoice>
+            <label class="availability__body-label">Country
+                <span class="availability__body-tooltip">
+                    <cb-tooltip explanationText="Select Country" styleVariant="stroke"
+                        [colorTheme]="cbToolTipColorTheme" direction="above-right">
+                        <cb-icon iconKey="utility-tooltip-stroke"></cb-icon>
+                    </cb-tooltip>
+
+                </span>
+            </label>
+
+            <select [required]="false" [disabled]="false" name="options" id="options" (change)="onCountryChange()"
+                required formControlName="countrycontrol">
+                <option *ngFor="let country of (countrylist | inputUnselect)" [value]="country.code"
+                    [text]="country.description" [selected]="country.code === field['countrycontrol'].value"
+                    [ngValue]="country.code">
+                    {{country.description}}
+                </option>
+            </select>
+
+        </div>
+
+        <div class="availability__togglediv" *ngIf="toShowtoogle">
+            <div>
+                <div cbToggle color="default" toggleOnText="Define availability by states"
+                    toggleOffText="Define availability by states" [showIcons]="true">
+                    <input type="checkbox" formControlName="availabilitybyStates"
+                        [checked]="field['availabilitybyStates'].value" (change)="onavailabiltyChange()" />
+
+                </div>
+                <div class="availability__togglediv-text">
+                    Turning on this option would show list of states for countries.
+                </div>
+            </div>
+        </div>
+
+
+
+        <div *ngIf="toShow">
+
+            <div class="availability__seconddiv">
+                <div class="availability__body-headerlabel">
+                    {{selectedcountrytext}}
+                </div>
+                <div>
+                    <label class="availability__body-labeltext">Policy would be available throughout all states unless
+                        otherwise
+                        stated.Once selection has been made,unselected stated would be deemed as blacklisted.</label>
+                </div>
+                <div class="availability__body-textarea" [cbSelectMultiple]="selectMultiple">
+                    <label class="availability__body-label">Select States
+                        <span class="availability__body-tooltip">
+                            <cb-tooltip
+                                explanationText="(Choose the states where you wish to make the product available)"
+                                styleVariant="stroke" direction="above-right">
+                                <cb-icon iconKey="utility-tooltip-stroke"></cb-icon>
+                            </cb-tooltip>
+                        </span>
+                    </label>
+
+                    <p-multiSelect #selectMultiple [selectAll]="selectAllStates" [options]="stateList"
+                        optionLabel="description" [(ngModel)]="selectedState" placeholder="Select States"
+                        inputId="#selectMultiple" formControlName="selectStates"
+                        (onChange)="onMultiSelectChange($event)"
+                        (onSelectAllChange)="onMultiSelectSelectAllChange($event)"></p-multiSelect>
+
+                </div>
+
+                <div *ngIf="selectedStateValues.length > 0">
+
+                    <p-chips fieldVariant="stroke" field="description" formControlName="statesChipControl"
+                        (onRemove)="onChipRemove($event)"></p-chips>
+                    <button cbButton label="Clear all selection" [disabled]="disableClrSelection" variant="primary"
+                        (click)="clearSelection()"></button>
+                </div>
+
+                <div cbTextArea class="availability__body-textarea" styleVariant="default">
+                    <label class="availability__body-label">Excluded zip codes
+                        <span class="availability__body-texttooltip">
+                            <cb-tooltip
+                                explanationText="(Input the zip codes where you want to restrict the product availability) "
+                                styleVariant="stroke" direction="above-right">
+                                <cb-icon iconKey="utility-tooltip-stroke"></cb-icon>
+                            </cb-tooltip>
+                        </span>
+                    </label>
+                    <textarea maxLength="100" [disabled]="false" formControlName="zipcodes">
+                    </textarea>
+                </div>
+
+
+            </div>
+        </div>
+        <div></div>
+        <div></div>
+    </form>
+</div>
+
+
+
+<div class="availability__footer-buttons products-footer-panel">
+    <div class="availability__footer-buttons--left">
+        <button cbButton label="Back" [leftIcon]="'utility-arrow-left'" variant="ghost" (click)="previous()"></button>
+    </div>
+    <div class="availability__footer-buttons--right">
+        <button cbButton label="Save & exit" variant="secondary" [colorTheme]="colorTheme" id="btnexit"
+            (click)="saveAndExit()" [disabled]="isSelect"></button>
+        <button cbButton label="Save changes" variant="primary" [colorTheme]='colorTheme' id="btnsave"
+            [disabled]="isSelect" (click)="saveAndNext()"></button>
+    </div>
+</div>

@@ -1,0 +1,40 @@
+<div class="state-configuration">
+  <div class="state-configuration__title">{{ labels.title }}</div>
+
+  <canvas-table
+    (formValidity)="handleformValidity($event)"
+    (saveEditableRow)="saveEditableRow($event)"
+    [data]="attributes"
+    [options]="options"
+  ></canvas-table>
+
+  <div class="footer-buttons">
+    <div class="footer-buttons--left">
+      <button
+        cbButton
+        [label]="labels.back"
+        [leftIcon]="'utility-arrow-left'"
+        variant="ghost"
+        (click)="onButtonAction(buttonActions.BACK)"
+      ></button>
+    </div>
+    <div class="footer-buttons--right">
+      <button
+        cbButton
+        [label]="labels.saveToDraft"
+        variant="secondary"
+        [colorTheme]="colorTheme"
+        (click)="onButtonAction(buttonActions.EXIT)"
+        [disabled]="!isValid"
+      ></button>
+      <button
+        cbButton
+        [label]="labels.next"
+        variant="primary"
+        [colorTheme]="colorTheme"
+        (click)="onButtonAction(buttonActions.NEXT)"
+        [disabled]="!isValid"
+      ></button>
+    </div>
+  </div>
+</div>

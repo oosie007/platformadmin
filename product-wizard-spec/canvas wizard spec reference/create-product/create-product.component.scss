@@ -1,0 +1,108 @@
+@import '@chubb/ui-components/styles/cb-textarea';
+@import '@chubb/ui-components/styles/cb-toggle';
+@import '../../../styles/date-picker';
+.product-overview {
+  &__container {
+    @apply cds-container cds-space-y-lg1;
+  }
+
+  &__title {
+    @apply cds-font-bold cds-font-lato cds-text-mobile-headline-6-medium cds-pb-5;
+  }
+
+  &__body {
+    &-wrapper {
+      @apply cds-flex cds-justify-center cds-items-start cds-pl-1 cds-mb-lg1 cds-space-x-lg1;
+
+      .cb-input {
+        &__label {
+          @apply cds-text-body-sm-regular-base cds-font-normal;
+        }
+      }
+
+      .cb-date-field {
+        &__label {
+          @apply cds-text-body-sm-regular-base cds-font-normal;
+        }
+      }
+
+      .cb-text-area {
+        &__label {
+          @apply cds-text-body-sm-regular-base cds-font-normal;
+        }
+      }
+    }
+
+    &--button {
+      @apply cds-pt-6;
+    }
+  }
+
+  &__currency {
+    @apply cds-space-y-lg1;
+
+    &-text {
+      @apply cds-font-normal cds-text-body-sm-regular-base;
+    }
+
+    &-wrapper {
+      @apply cds-flex cds-justify-start cds-items-start cds-pl-1 cds-mb-lg1 cds-space-x-lg1;
+
+      .cb-select-choice {
+        &__label {
+          @apply cds-text-body-sm-regular-base cds-font-normal cds-space-y-lg1;
+        }
+
+        // @apply cds-w-1/2;
+      }
+    }
+  }
+  &__currency-filed {
+    width: 50% !important;
+  }
+
+  &__country {
+    width: 50% !important;
+    @apply cds-flex cds-justify-center cds-items-start cds-pl-1 cds-mb-lg1 cds-space-x-lg1;
+
+    .cb-input {
+      &__label {
+        @apply cds-text-body-sm-regular-base cds-font-normal;
+      }
+    }
+
+    &__form-field {
+      @apply cds-flex cds-flex-col;
+    }
+  }
+
+  &__footer-buttons {
+    @apply cds-flex cds-justify-between cds-items-center cds-no-underline;
+
+    &--right {
+      @apply cds-flex;
+
+      .cb-button {
+        @apply cds-mx-2;
+      }
+    }
+
+    &--left {
+      .cb-button {
+        @apply cds-pl-0;
+      }
+    }
+  }
+  &__form-field {
+    @apply cds-flex cds-flex-col;
+  }
+  &__error-message-container {
+    @apply cds-flex cds-order-1;
+  }
+}
+
+.cb-tooltip {
+  .tippy-box {
+    @apply cds-whitespace-pre-line;
+  }
+}

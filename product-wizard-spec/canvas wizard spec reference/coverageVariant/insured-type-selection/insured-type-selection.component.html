@@ -1,0 +1,64 @@
+<div class='insured-type-selection__container'>
+  <div class="insured-type-selection__wrapper">
+    <h4 class="insured-type-selection__header">1 of 3 Insured type</h4>
+    <h3 class="insured-type-selection__header">Insured type selection</h3>
+    <p class="insured-type-selection__header3">Please choose ONE insured type below. Information on the chosen type will
+      be shown upon selection.</p>
+
+    <div class="insured-type-selection__button-group">
+      <ng-container *ngFor="let item of tabItems">
+        <div class="insured-type-selection__button-wrapper"
+             [ngClass]="{'insured-type-selection__button-active': item.isActive,
+              'insured-type-selection__button-inactive': !item.isActive}"
+             (click)="onTabClick(item)">
+          <button cbButton
+                  [disabled]="item.isDisabled"
+                  [label]="item.description"
+                  variant="primary"
+                  [colorTheme]='cbColorTheme.DEFAULT'>
+            <cb-icon [iconKey]="item.iconKey"
+                     [iconColor]="item.isActive? 'neutral-100': 'neutral-400'"
+                     [iconSize]="cbIconSize.LARGE"
+                     [addPointerClass]="true">
+            </cb-icon>
+          </button>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+
+  <div class="insured-type-selection__main-content">
+    <ng-container [ngSwitch]="selectedTab.id"
+                  *ngIf="selectedTab && !selectedTab.isDisabled">
+      <ng-container *ngSwitchCase="'individualInsured'">
+        <canvas-insured-type></canvas-insured-type>
+      </ng-container>
+      <ng-container *ngSwitchCase="'insuredObject'">
+        <canvas-insured-object></canvas-insured-object>
+      </ng-container>
+      <ng-container *ngSwitchCase="'insuredEvent'">
+        <canvas-insured-event></canvas-insured-event>
+      </ng-container>
+    </ng-container>
+  </div>
+
+  <cb-modal [open]="openModal"
+            (closeEvent)="handleModal()"
+            title="Switching insured type selection?"
+            message="Switching between insured type would result in resetting the saved data. Do you wish to continue?"
+            [hideCloseIcon]="false">
+    <div class="insured-type-selection__modal-button-wrapper">
+      <button cbButton
+              label="Cancel"
+              variant="secondary"
+              (click)="handleModal()">
+      </button>
+      <button cbButton
+              label="Continue"
+              variant="primary"
+              [colorTheme]='cbColorTheme.DEFAULT'
+              (click)="onConfirm()">
+      </button>
+    </div>
+  </cb-modal>
+</div>

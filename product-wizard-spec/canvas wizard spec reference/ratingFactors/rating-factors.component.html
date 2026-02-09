@@ -1,0 +1,353 @@
+<div class="rating__container">
+  <h4 class="header">Select rating factors</h4>
+  <div class="rating__main-content">
+    <form [formGroup]="ratingFactorListForm">
+      <div formGroupName="ratingFactorsList">
+        <div class="rating__select-rating">
+          <div cbCheckbox [colorTheme]="colorTheme">
+            <input
+              type="checkbox"
+              [checked]="applySelectAll"
+              (change)="selectAllRatingFactor()"
+              [disabled]="isDisabled"
+            />
+          </div>
+          <label>Select all rating factors</label>
+        </div>
+
+        <div
+          formArrayName="ratingFactors"
+          *ngFor="let rf of formArray.controls; let i = index"
+        >
+          <div
+            [formGroupName]="i"
+            class="rating__select-rating"
+            (dblclick)="editRatingFactor(i)"
+          >
+            <div cbCheckbox [colorTheme]="colorTheme">
+              <input type="checkbox" formControlName="selected" [disabled]="isDisabled" />
+            </div>
+            <label>{{ rf.value.label }}</label>
+            <ng-container *ngIf="rf.value.label === 'Age'">
+              <div class="flex flex-row py-20">
+                <cb-icon iconKey="utility-tooltip-stroke" class="px-10"> </cb-icon>
+                <label class="text-sm px-2 info"
+                  >Selection of Age will redirect to add age bands screen</label
+                >
+              </div>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+    </form>
+    <button
+      cbButton
+      label="Add rating factors"
+      [leftIcon]="'utility-add'"
+      variant="ghost"
+      [colorTheme]="colorTheme"
+      (click)="toggleDrawer()"
+      [disabled]="isDisabled"
+    ></button>
+  </div>
+
+  <div class="flex button-group">
+    <div class="flex cds-items-start">
+      <button
+        cbButton
+        label="Back"
+        [leftIcon]="'utility-arrow-left'"
+        variant="ghost"
+        (click)="previous()"
+      ></button>
+    </div>
+    <div class="button-right">
+      <button
+        class="button"
+        cbButton
+        label="Save & exit"
+        variant="secondary"
+        [colorTheme]="colorTheme"
+        (click)="saveAndExit()"
+        [disabled]="isDisabled"
+      ></button>
+      <button
+        class="button"
+        cbButton
+        label="Next"
+        variant="primary"
+        [colorTheme]="colorTheme"
+        (click)="next()"
+      ></button>
+    </div>
+  </div>
+</div>
+
+<canvas-drawer
+  class="drawer"
+  styleClass="drawer-customized"
+  *ngIf="openCreateDrawer"
+  [visible]="openCreateDrawer"
+  (closed)="toggleDrawer()"
+>
+  <div header class="drawer__header">Add rating factors</div>
+  <div content>
+    <form class="form" [formGroup]="addRatingFactorForm">
+      <div
+        class="form-field-container"
+        cbInput
+        label="Rating factor name"
+        styleVariant="default"
+      >
+        <input
+          placeholder=""
+          type="text"
+          pattern=".*"
+          maxLength="50"
+          formControlName="ratingFactorName"
+        />
+      </div>
+
+      <div
+        class="form-field-container"
+        cbToggle
+        color="default"
+        toggleOnText="Allow custom defined"
+        toggleOffText="Allow custom defined"
+        [showIcons]="true"
+      >
+        <input type="checkbox" formControlName="allowCustom" />
+      </div>
+
+      <div
+        class="form-field-container"
+        cbSelectChoice
+        label="Custom attributes"
+        styleVariant="default"
+        placeholder="Select"
+        *ngIf="!addRatingFactorForm.get('allowCustom')?.value"
+      >
+        <select
+          [required]="true"
+          [disabled]="false"
+          name="options"
+          id="options"
+          formControlName="associatedAttribute"
+        >
+          <option
+            *ngFor="let attr of (customProductAttributes | inputUnselect)"
+            [ngValue]="attr.description"
+          >
+            {{ attr.description }}
+          </option>
+        </select>
+      </div>
+
+      <div
+        formArrayName="values"
+        *ngIf="addRatingFactorForm.get('allowCustom')?.value"
+      >
+        <div
+          *ngFor="let values of values.controls; let i = index"
+          [formGroupName]="i"
+        >
+          <div class="remove-button">
+            <cb-icon
+              iconKey="utility-trash-fill"
+              iconColor="error-saturated"
+              [addPointerClass]="true"
+              (click)="removeDefinedValue(i)"
+            ></cb-icon>
+          </div>
+          <div
+            class="form-field-container"
+            cbInput
+            label="Answer ID"
+            styleVariant="default"
+          >
+            <input
+              placeholder=""
+              type="text"
+              pattern=".*"
+              maxLength="50"
+              formControlName="answerID"
+            />
+          </div>
+          <div cbInput label="Answer Value" styleVariant="default">
+            <input
+              placeholder=""
+              type="text"
+              pattern=".*"
+              maxLength="50"
+              formControlName="answerValue"
+            />
+          </div>
+        </div>
+      </div>
+      <div *ngIf="addRatingFactorForm.get('allowCustom')?.value">
+        <button
+          cbButton
+          label="Add"
+          [leftIcon]="'utility-add'"
+          variant="ghost"
+          [colorTheme]="colorTheme"
+          (click)="addDefinedValue()"
+        ></button>
+      </div>
+    </form>
+  </div>
+  <ng-container footer>
+    <div class="flex">
+      <button
+        class="drawer-button"
+        cbButton
+        label="Cancel"
+        variant="secondary"
+        (click)="toggleDrawer()"
+      ></button>
+      <button
+        class="drawer-button"
+        cbButton
+        label="Save"
+        (click)="onSaveRatingFactor()"
+      ></button>
+    </div>
+  </ng-container>
+</canvas-drawer>
+
+<canvas-drawer
+  class="drawer"
+  styleClass="drawer-customized"
+  *ngIf="openEditDrawer"
+  [visible]="openEditDrawer"
+  (closed)="toggleEditDrawer()"
+>
+  <div header class="drawer__header">Edit Rating Factor</div>
+  <div content>
+    <form class="form" [formGroup]="editRatingFactorForm">
+      <div
+        class="form-field-container"
+        cbInput
+        label="Rating Factor Name"
+        styleVariant="default"
+      >
+        <input
+          placeholder=""
+          type="text"
+          pattern=".*"
+          maxLength="50"
+          formControlName="ratingFactorName"
+        />
+      </div>
+
+      <div
+        class="form-field-container"
+        cbToggle
+        color="default"
+        toggleOnText="Allow Custom Defined"
+        toggleOffText="Allow Custom Defined"
+        [showIcons]="true"
+      >
+        <input type="checkbox" formControlName="allowCustom" />
+      </div>
+
+      <div
+        class="form-field-container"
+        class="cb-select-choice"
+        label="Custom attributes"
+        styleVariant="default"
+        placeholder="Select"
+        *ngIf="!editRatingFactorForm.get('allowCustom')?.value"
+      >
+        <label class="cb-input__label">Custom attributes</label>
+        <select
+          class="cb-select-choice__base-select cb-select-choice__custom-select"
+          [required]="true"
+          [disabled]="false"
+          name="options"
+          id="options"
+          formControlName="associatedAttribute"
+        >
+          <option
+            *ngFor="let attr of customProductAttributes"
+            [ngValue]="attr.description"
+            [selected]="
+              attr.description === editField['associatedAttribute'].value
+            "
+          >
+            {{ attr.description }}
+          </option>
+        </select>
+      </div>
+
+      <div
+        formArrayName="values"
+        *ngIf="editRatingFactorForm.get('allowCustom')?.value"
+      >
+        <div
+          *ngFor="let values of editCustomValues.controls; let i = index"
+          [formGroupName]="i"
+        >
+          <div class="remove-button">
+            <cb-icon
+              iconKey="utility-trash-fill"
+              iconColor="error-saturated"
+              [addPointerClass]="true"
+              (click)="removeDefinedValueEdit(i)"
+            ></cb-icon>
+          </div>
+          <div
+            class="form-field-container"
+            cbInput
+            label="Answer ID"
+            styleVariant="default"
+          >
+            <input
+              placeholder=""
+              type="text"
+              pattern=".*"
+              maxLength="50"
+              formControlName="answerID"
+            />
+          </div>
+          <div cbInput label="Answer Value" styleVariant="default">
+            <input
+              placeholder=""
+              type="text"
+              pattern=".*"
+              maxLength="50"
+              formControlName="answerValue"
+            />
+          </div>
+        </div>
+      </div>
+      <div *ngIf="editRatingFactorForm.get('allowCustom')?.value">
+        <button
+          cbButton
+          label="Add"
+          [leftIcon]="'utility-add'"
+          variant="ghost"
+          [colorTheme]="colorTheme"
+          (click)="addDefinedValueEdit()"
+        ></button>
+      </div>
+    </form>
+  </div>
+  <ng-container footer>
+    <div class="flex">
+      <button
+        class="drawer-button"
+        cbButton
+        label="Cancel"
+        variant="secondary"
+        (click)="toggleEditDrawer()"
+      ></button>
+      <button
+        class="drawer-button"
+        cbButton
+        label="Save"
+        (click)="onEditRatingFactor()"
+      ></button>
+    </div>
+  </ng-container>
+</canvas-drawer>

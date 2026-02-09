@@ -1,0 +1,200 @@
+.coverage-variant-level {
+    &__container {
+        @apply cds-container;
+
+        .cb-button--primary-theme{
+         background-color: white !important;
+        }
+    }
+
+    &__title {
+        @apply cds-font-bold cds-font-lato cds-text-2xl cds-pb-5;
+    }
+
+    &__header {
+        &-wrapper {
+            @apply cds-flex cds-justify-center cds-items-end cds-gap-x-lg1 cds-self-stretch cds-pb-lg1;
+        }
+
+        &-levels {
+          @apply cds-flex cds-gap-4 cds-justify-evenly cds-w-full;
+          
+          .cb-input {   
+            &__label {
+              @apply cds-mb-2;
+            }
+          }
+      }
+
+      &-buttons {
+          // @apply cds-p-4;
+          &:disabled, &:hover, &:focus {
+            // @apply cds-p-4;
+          }
+      }
+      &-addlevels {
+        @apply cds-w-48;
+      }
+
+      &-label-placeholder {
+        height: 26px;
+      }
+
+        &-factor {
+            @apply cds-flex cds-items-center cds-gap-1;
+        }
+
+        
+        // &-levels {
+        //     @apply cds-grid cds-gap-1 cds-items-start;
+        //     grid-template-columns: auto auto auto;
+        // }
+
+        // &-buttons {
+        //     @apply cds-p-4 cds-mt-7;
+        // }
+    }
+
+    &__no-data {
+        @apply cds-flex cds-align-middle cds-justify-center cds-flex-col cds-items-center cds-font-lato cds-py-40;
+
+        &-header {
+            @apply cds-font-bold cds-font-lato cds-text-mobile-headline-6-medium cds-pt-2;
+        }
+
+        &-sub-header {
+            @apply cds-font-body-regular-base cds-text-xs cds-py-2;
+        }
+    }
+
+
+    &__accordions {
+        &-wrapper {
+          .p-accordion {
+            .p-accordion-tab {
+              @apply cds-shadow-none cds-border-neutral-200 cds-border-t-1 cds-border-solid;
+              .p-toggleable-content {
+                @apply cds-mb-4;
+              }
+              .p-accordion-toggle-icon {
+                @apply cds-ml-0;
+              }
+            }
+   
+            .p-element:last-of-type .p-accordion-tab {
+              @apply cds-border-neutral-200 cds-border-b-1 cds-border-solid;
+            }
+   
+            .p-accordion-header .p-accordion-header-link {
+              @apply cds-pl-0 cds-bg-white;
+   
+              .p-accordion-header-text {
+                @apply cds-font-bold cds-font-lato cds-text-mobile-headline-6-medium;
+              }
+            }
+   
+            .p-accordion-content {
+              @apply cds-p-0;
+            }
+   
+            .p-accordion-header:not(.p-highlight):not(.p-disabled):hover .p-accordion-header-link {
+              @apply cds-bg-white cds-border-s-white;
+            }
+   
+            .p-accordion-tab:not(.p-accordion-tab-active) .p-accordion-header-link:focus {
+              @apply cds-bg-white;
+            }
+          }
+        }
+   
+        &-form {
+          &-toggle {
+            @apply cds-mb-lg1;
+   
+            .cb-toggle__text {
+              @apply cds-font-bold;
+            }
+   
+            &-text {
+              @apply cds-font-lato cds-text-body-sm-regular-base cds-mt-1;
+            }
+          }
+   
+          &-row {
+            @apply cds-flex cds-gap-lg1;
+   
+            .cb-input,
+            .cb-select-choice {   
+              &__label {
+                @apply cds-mb-2;
+              }
+            }
+          }
+        }
+      }
+
+    &__body {
+        &-wrapper {
+            @apply cds-flex cds-gap-7 cds-mb-5;
+
+            .cb-input,
+            .cb-select-choice {   
+              &__label {
+                @apply cds-mb-2;
+              }
+            }
+        }
+    }
+
+    &__navigation {
+        &-wrapper {
+            @apply cds-flex cds-justify-between cds-items-center cds-pb-2;
+            
+            &--left {
+                @apply cds-flex cds-gap-3;
+            }
+        }
+    }
+
+    &__text {
+      @apply cds-font-lato cds-mb-3;  
+    }
+
+    &__accordion-header {
+        @apply cds-flex cds-justify-between cds-flex-grow cds-items-center;
+
+        .cb-button--primary-theme {
+            @apply cds-bg-inherit;
+        }
+        .cb-button--primary-theme:hover {
+            text-decoration: underline;
+        }
+    }
+
+    &__footer-buttons {
+        @apply cds-flex cds-justify-between cds-items-center cds-no-underline cds-pt-2;
+    
+        &--right {
+          @apply cds-flex;
+    
+          .cb-button {
+            @apply cds-mx-2;
+          }
+        }
+    
+        &--left {
+          .cb-button {
+            @apply cds-pl-0;
+          }
+        }
+      }
+    &__modal-button-wrapper {
+      @apply cds-flex cds-justify-end cds-mt-lg1;
+  
+      .cb-button:first-of-type {
+        @apply cds-mr-lg1;
+      }
+    }
+
+}
+

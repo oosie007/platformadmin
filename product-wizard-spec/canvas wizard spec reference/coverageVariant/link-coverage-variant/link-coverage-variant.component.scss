@@ -1,0 +1,18 @@
+.link-coverage-variants {
+&__footer-buttons {
+    @apply cds-flex cds-justify-between cds-items-center cds-pt-12 cds-no-underline;
+
+    &--right {
+      @apply cds-flex;
+
+      .cb-button {
+        @apply cds-mx-2;
+      }
+    }
+    &--left {
+      .cb-button {
+        @apply cds-pl-0;
+      }
+    }
+  }
+}

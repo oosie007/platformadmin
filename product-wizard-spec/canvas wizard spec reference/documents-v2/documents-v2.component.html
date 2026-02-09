@@ -1,0 +1,97 @@
+<p-toast position="top-right" key="tr"></p-toast>
+<div class="documents-v2__container">
+  <div class="documents-v2__head">
+    <div class="documents-v2__title">{{ labels.title }}</div>
+    <div class="documents-v2__head--button">
+      <button
+        cbButton
+        [label]="labels.addDocsBtnlabel"
+        variant="secondary"
+        leftIcon="utility-add"
+        [colorTheme]="colorTheme"
+        (click)="onAddDocument()"
+        [disabled]="isFinalStatus"
+      ></button>
+    </div>
+  </div>
+  <div class="documents-v2__search">
+    <div cbSearchInput styleVariant="default" [colorTheme]="colorTheme">
+      <div class="cb-search-input__wrapper">
+        <span class="p-inputgroup-addon">
+          <cb-icon
+            iconKey="utility-search"
+            [iconColor]="'neutral-400'"
+          ></cb-icon>
+        </span>
+        <p-autoComplete
+          [(ngModel)]="searchedDocuments"
+          [suggestions]="documents"
+          field="name"
+          (completeMethod)="searchDocuments($event)"
+          [placeholder]="labels.searchPlaceholder"
+          (onClear)="onSearchClear($event)"
+        >
+        </p-autoComplete>
+      </div>
+    </div>
+  </div>
+
+  <div class="documents-v2__grid">
+    <canvas-table [data]="documents" [options]="options"></canvas-table>
+  </div>
+
+  <canvas-sidebar-form
+    *ngIf="showDrawer"
+    [(visible)]="showDrawer"
+    [title]="labels.addDocsBtnlabel"
+    [schema]="addDocSchema"
+    [actionsInFooter]="true"
+    (submitted)="onUploadDocument($event)"
+    (formEmitter)="onSidebarFormChange($event)"
+    [submitButtonLabel]="labels.uploadBtn"
+    [cancelButtonLabel]="labels.cancelBtn"
+    (cancelled)="toggleDrawer($event)"
+  ></canvas-sidebar-form>
+</div>
+
+<div class="documents-v2__footer-buttons">
+  <div class="documents-v2__footer-buttons--left">
+    <button
+      cbButton
+      [label]="labels.backBtnLabel"
+      [leftIcon]="'utility-arrow-left'"
+      variant="ghost"
+      (click)="previous()"
+    ></button>
+  </div>
+  <div class="documents-v2__footer-buttons--right">
+    <button
+      cbButton
+      [label]="labels.saveAndExitBtnLabel"
+      variant="primary"
+      [colorTheme]="colorTheme"
+      (click)="saveAndExit()"
+    ></button>
+  </div>
+</div>
+
+<canvas-sidebar-form
+    *ngIf="showEditDrawer"
+    [(visible)]="showEditDrawer"
+    [title]="labels.EditDocHeaderLabel"
+    [schema]="editDocumentSchema"
+    [model]="editDocumentModel"
+    [actionsInFooter]="true"
+    (submitted)="onEditDocument($event)"
+    [submitButtonLabel]="labels.uploadBtn"
+    [cancelButtonLabel]="labels.cancelBtn"
+    (cancelled)="toggleDrawer($event)"
+  ></canvas-sidebar-form>
+
+<cb-modal [open]="openDeleteModal" (closeEvent)="handleDeleteModal()" title="Do you want to delete the document?"
+  message="" [hideCloseIcon]="false">
+  <div class="documents-v2__modal-button-wrapper">
+    <button cbButton label="Cancel" variant="secondary" (click)="handleDeleteModal()"></button>
+    <button cbButton label="Yes" variant="primary" colorTheme="default" (click)="deleteConfirmation()"></button>
+  </div>
+</cb-modal>

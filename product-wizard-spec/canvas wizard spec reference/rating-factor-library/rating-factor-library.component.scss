@@ -1,0 +1,52 @@
+@import '../../../styles/custom-table';
+
+.ratinglib {
+  &__container {
+    @apply cds-container cds-p-5 cds-mx-auto cds-flex cds-flex-col cds-gap-4;
+  }
+  &__title {
+    @apply cds-text-neutral-800 cds-text-base cds-font-bold cds-font-['Lato'] cds-leading-snug;
+  }
+  &__search-create {
+    @apply cds-flex cds-gap-lg1;
+  }
+}
+
+.button-group {
+  @apply cds-pt-2 cds-flex cds-justify-between cds-mt-4 cds-items-center cds-no-underline;
+}
+
+.link {
+  @apply cds-cursor-pointer cds-pl-1 cds-ml-1 cds-font-400;
+}
+
+.cb-button {
+  @apply cds-mx-2;
+}
+
+//needs to be removed later
+.cb-search-input .error-text-container {
+  display: none;
+}
+
+.ratinglib {
+  &__footer-buttons {
+    @apply cds-flex cds-justify-between cds-items-center cds-pt-12 cds-no-underline;
+
+    &--right {
+      @apply cds-flex;
+
+      .cb-button {
+        @apply cds-mx-2;
+      }
+    }
+    &--left {
+      .cb-button {
+        @apply cds-pl-0;
+      }
+    }
+  }
+}
+
+
+

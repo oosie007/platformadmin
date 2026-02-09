@@ -1,0 +1,556 @@
+<div class="coverage-variant-level__container">
+  <div class="coverage-variant-level__title">
+    {{ title }}
+  </div>
+  <form>
+    <div class="coverage-variant-level__header-wrapper">
+      <div class="coverage-variant-level__header-levels">
+        <div
+          cbInput
+          label="Number of levels"
+          styleVariant="default"
+          [errorMessage]="_setErrorMessages()"
+        >
+          <form [formGroup]="coverageLevelsForm">
+            <input
+              placeholder=""
+              type="text"
+              formControlName="coverageLevelsCount"
+            />
+          </form>
+        </div>
+        <div>
+          <div class="coverage-variant-level__header-label-placeholder"></div>
+          <button
+            class="coverage-variant-level__header-buttons coverage-variant-level__header-addlevels"
+            cbButton
+            variant="primary"
+            (click)="addLevels()"
+            [colorTheme]="colorTheme"
+            label="Add levels"
+            [leftIcon]="'utility-add'"
+            [disabled]="!coverageLevelsForm.valid"
+          ></button>
+        </div>
+      </div>
+    </div>
+    <div
+      *ngIf="!isVariantLevelAvailable"
+      class="coverage-variant-level__no-data"
+    >
+      <div class="coverage-variant-level__no-data-header">
+        No data available
+      </div>
+      <div class="coverage-variant-level__no-data-sub-header">
+        No Level data found on this list
+      </div>
+      <div>
+        <button
+          class="coverage-variant-level__header-buttons"
+          cbButton
+          variant="primary"
+          label="Create coverage level"
+          (click)="NavigateToCoverageLevels()"
+          [colorTheme]="colorTheme"
+          [leftIcon]="'utility-edit-section'"
+        ></button>
+      </div>
+    </div>
+    <div *ngIf="isVariantLevelAvailable">
+      <div
+        *ngIf="coverageVariantLevelDetails.length > 0"
+        class="coverage-variant-level__accordions-wrapper"
+      >
+        <p-accordion [multiple]="true" [activeIndex]="[0]">
+          <ng-container
+            *ngFor="let level of coverageVariantLevelDetails; let i = index"
+          >
+            <p-accordionTab>
+              <ng-template pTemplate="header">
+                <div class="coverage-variant-level__accordion-header">
+                  <div>
+                    {{ level.description }}
+                  </div>
+                  <div class="coverage-variant-level__header-factor">
+                    <div
+                      *ngIf="i > 0"
+                      cbInput
+                      styleVariant="default"
+                      [errorState]="false"
+                    >
+                      <input
+                        placeholder=""
+                        type="text"
+                        pattern=".*"
+                        maxLength="50"
+                        [required]="false"
+                        [(ngModel)]="level.multipleFactor"
+                        (ngModelChange)="
+                          updateMaxAmount(
+                            level.description,
+                            level.multipleFactor
+                          )
+                        "
+                        [disabled]="level.disableEdit"
+                        [ngModelOptions]="{ standalone: true }"
+                      />
+                    </div>
+                    <div>
+                      <button
+                        cbButton
+                        variant="primary"
+                        [leftIcon]="
+                          level.disableEdit || isDisabled
+                            ? 'utility-visibility-fill'
+                            : 'utility-edit-stroke'
+                        "
+                        (click)="editLevel(level)"
+                      ></button>
+                    </div>
+                    <div>
+                      <button
+                        cbButton
+                        variant="primary"
+                        [leftIcon]="'utility-trash-fill'"
+                        [disabled]="level.disableEdit || isDisabled"
+                        (click)="
+                          enableDeleteConfirmation(level.coverageLevelId)
+                        "
+                      ></button>
+                    </div>
+                  </div>
+                </div>
+              </ng-template>
+              <ng-container *ngIf="!coverageFactorPermutations">
+                <p class="coverage-variant-level__text">Maximum limit value</p>
+                <field-sets [disable]="fieldsetDisabled">
+                  <div class="coverage-variant-level__body-wrapper">
+                    <ng-container>
+                      <div
+                        cbSelectChoice
+                        label="Cumulative limit type"
+                        styleVariant="default"
+                        placeholder="Aggregate limit type"
+                      >
+                        <select
+                          [disabled]="level.disableEdit || isDisabled"
+                          name="options"
+                          id="options"
+                          [(ngModel)]="level.aggregateLimitType"
+                          [ngModelOptions]="{ standalone: true }"
+                        >
+                          <option
+                            *ngFor="let type of aggregateType | inputUnselect"
+                            [ngValue]="type.code"
+                          >
+                            {{ type.description }}
+                          </option>
+                        </select>
+                      </div>
+                      <div
+                        cbInput
+                        label="Cumulative value"
+                        styleVariant="default"
+                      >
+                        <input
+                          placeholder=""
+                          type="text"
+                          pattern=".*"
+                          [required]="false"
+                          [disabled]="level.disableEdit || isDisabled"
+                          [(ngModel)]="level.aggregateMaxValue"
+                          [ngModelOptions]="{ standalone: true }"
+                        />
+                      </div>
+                      <div
+                        *ngIf="level.aggregateLimitType === 'PERCENTAGE'"
+                        cbSelectChoice
+                        label="Percentage"
+                        styleVariant="default"
+                        placeholder="Select coverage variant"
+                      >
+                        <select
+                          [disabled]="level.disableEdit || isDisabled"
+                          name="options"
+                          id="options"
+                          [(ngModel)]="level.aggregateCoverageVariantPercentage"
+                          [ngModelOptions]="{ standalone: true }"
+                        >
+                          <option
+                            *ngFor="let type of coverageList | inputUnselect"
+                            [ngValue]="type.coverageVariantId"
+                            [(ngModel)]="
+                              level.aggregateCoverageVariantPercentage
+                            "
+                          >
+                            {{ type.coverageVariantId }}
+                          </option>
+                        </select>
+                      </div>
+                    </ng-container>
+                  </div>
+                  <div class="coverage-variant-level__body-wrapper">
+                    <ng-container
+                      *ngFor="let insuredLevel of level.insuredLevel"
+                    >
+                      <div
+                        *ngIf="insuredLevel.isMIApplicable"
+                        cbInput
+                        label="Main Insured"
+                        styleVariant="default"
+                      >
+                        <input
+                          placeholder=""
+                          type="text"
+                          pattern=".*"
+                          [required]="false"
+                          [disabled]="level.disableEdit || isDisabled"
+                          [(ngModel)]="insuredLevel.maxAmount"
+                          [ngModelOptions]="{ standalone: true }"
+                        />
+                      </div>
+                      <div
+                        *ngIf="insuredLevel.isSpouseApplicable"
+                        cbInput
+                        label="Spouse"
+                        styleVariant="default"
+                      >
+                        <input
+                          placeholder=""
+                          type="text"
+                          pattern=".*"
+                          [required]="false"
+                          [disabled]="level.disableEdit || isDisabled"
+                          [(ngModel)]="insuredLevel.maxAmount"
+                          [ngModelOptions]="{ standalone: true }"
+                        />
+                      </div>
+                      <div
+                        *ngIf="insuredLevel.isDependentChildApplicable"
+                        cbInput
+                        label="Dependent-Child"
+                        styleVariant="default"
+                      >
+                        <input
+                          placeholder=""
+                          type="text"
+                          pattern=".*"
+                          [required]="false"
+                          [disabled]="level.disableEdit || isDisabled"
+                          [(ngModel)]="insuredLevel.maxAmount"
+                          [ngModelOptions]="{ standalone: true }"
+                        />
+                      </div>
+                      <div
+                        *ngIf="insuredLevel.isDependentAdultApplicable"
+                        cbInput
+                        label="Dependent-Adult"
+                        styleVariant="default"
+                      >
+                        <input
+                          placeholder=""
+                          type="text"
+                          pattern=".*"
+                          [required]="false"
+                          [disabled]="level.disableEdit || isDisabled"
+                          [(ngModel)]="insuredLevel.maxAmount"
+                          [ngModelOptions]="{ standalone: true }"
+                        />
+                      </div>
+                    </ng-container>
+                  </div>
+                </field-sets>
+              </ng-container>
+            </p-accordionTab>
+          </ng-container>
+        </p-accordion>
+      </div>
+      <div
+        *ngIf="covVariantLevelDetails.length > 0"
+        class="coverage-variant-level__accordions-wrapper"
+      >
+        <p-accordion [multiple]="true" [activeIndex]="[0]">
+          <ng-container
+            *ngFor="let level of covVariantLevelDetails; let i = index"
+          >
+            <p-accordionTab>
+              <ng-template pTemplate="header">
+                <div class="coverage-variant-level__accordion-header">
+                  <div>
+                    {{ level.description }}
+                  </div>
+                  <div class="coverage-variant-level__header-factor">
+                    <div
+                      *ngIf="i > 0"
+                      cbInput
+                      styleVariant="default"
+                      [errorState]="false"
+                    >
+                      <input
+                        placeholder=""
+                        type="text"
+                        pattern=".*"
+                        maxLength="50"
+                        [required]="false"
+                        [(ngModel)]="level.multipleFactor"
+                        [disabled]="level.disableEdit || isDisabled"
+                        [ngModelOptions]="{ standalone: true }"
+                      />
+                    </div>
+                    <div>
+                      <button
+                        cbButton
+                        [leftIcon]="
+                          level.disableEdit || isDisabled
+                            ? 'utility-visibility-fill'
+                            : 'utility-edit-stroke'
+                        "
+                        (click)="editLevel(level)"
+                      ></button>
+                    </div>
+                    <div>
+                      <button
+                        cbButton
+                        [leftIcon]="'utility-trash-fill'"
+                        (click)="
+                          enableDeleteConfirmation(level.coverageLevelId)
+                        "
+                        [disabled]="level.disableEdit || isDisabled"
+                      ></button>
+                    </div>
+                  </div>
+                </div>
+              </ng-template>
+              <field-sets [disable]="fieldsetDisabled">
+                <div class="coverage-variant-level__body-wrapper">
+                  <ng-container>
+                    <div
+                      cbSelectChoice
+                      label="Cumulative limit type"
+                      styleVariant="default"
+                      placeholder="Aggregate limit type"
+                    >
+                      <select
+                        [disabled]="level.disableEdit || isDisabled"
+                        name="options"
+                        id="options"
+                        [(ngModel)]="level.aggregateLimitType"
+                        [ngModelOptions]="{ standalone: true }"
+                      >
+                        <option
+                          *ngFor="let type of aggregateType | inputUnselect"
+                          [ngValue]="type.code"
+                        >
+                          {{ type.description }}
+                        </option>
+                      </select>
+                    </div>
+                    <div
+                      cbInput
+                      label="Cumulative value"
+                      styleVariant="default"
+                    >
+                      <input
+                        placeholder=""
+                        type="text"
+                        pattern=".*"
+                        [required]="false"
+                        [disabled]="level.disableEdit || isDisabled"
+                        [(ngModel)]="level.aggregateMaxValue"
+                        [ngModelOptions]="{ standalone: true }"
+                      />
+                    </div>
+                    <div
+                      *ngIf="level.aggregateLimitType === 'PERCENTAGE'"
+                      cbSelectChoice
+                      label="Percentage"
+                      styleVariant="default"
+                      placeholder="Select coverage variant"
+                    >
+                      <select
+                        [disabled]="level.disableEdit || isDisabled"
+                        name="options"
+                        id="options"
+                        [(ngModel)]="level.aggregateCoverageVariantPercentage"
+                        [ngModelOptions]="{ standalone: true }"
+                      >
+                        <option
+                          *ngFor="let type of coverageList | inputUnselect"
+                          [ngValue]="type.coverageVariantId"
+                          [(ngModel)]="level.aggregateCoverageVariantPercentage"
+                        >
+                          {{ type.coverageVariantId }}
+                        </option>
+                      </select>
+                    </div>
+                  </ng-container>
+                </div>
+                <p>Maximum Limit Value (per item)</p>
+                <div class="coverage-variant-level__body-wrapper">
+                  <ng-container
+                    *ngFor="let insuredObjectLevel of level.insuredObject"
+                  >
+                    <div
+                      cbInput
+                      [label]="insuredObjectLevel.description"
+                      styleVariant="default"
+                    >
+                      <input
+                        placeholder=""
+                        type="text"
+                        pattern=".*"
+                        [required]="false"
+                        [disabled]="level.disableEdit || isDisabled"
+                        [(ngModel)]="insuredObjectLevel.maxAmount"
+                        [ngModelOptions]="{ standalone: true }"
+                      />
+                    </div>
+                  </ng-container>
+                </div>
+                <div class="coverage-variant-level__body-wrapper">
+                  <ng-container
+                    *ngFor="let insuredEventLevel of level.insuredEvent"
+                  >
+                    <div
+                      cbInput
+                      [label]="insuredEventLevel.description"
+                      styleVariant="default"
+                    >
+                      <input
+                        placeholder=""
+                        type="text"
+                        pattern=".*"
+                        [required]="false"
+                        [disabled]="level.disableEdit || isDisabled"
+                        [(ngModel)]="insuredEventLevel.maxAmount"
+                        [ngModelOptions]="{ standalone: true }"
+                      />
+                    </div>
+                  </ng-container>
+                </div>
+              </field-sets>
+            </p-accordionTab>
+          </ng-container>
+        </p-accordion>
+      </div>
+      <!-- <div class="coverage-variant-level__navigation-wrapper">
+        <div class="coverage-variant-level__navigation-wrapper--left">
+            <cb-items-shown-indicator [rows]="rows" [totalRecords]="coverageVariantLevelDetails.length" [first]="1">
+            </cb-items-shown-indicator>
+            <cb-items-shown-adjustor [rows]="rows" [totalRecords]="coverageVariantLevelDetails.length"
+                [first]="rows" (paginationChange)="onChange($event)" [rowSelectorOptions]="rowSelectorOptions">
+            </cb-items-shown-adjustor>
+        </div>
+        <div class="overage-variant-level__navigation-wrapper--right">
+            <cb-pagination-nav-handle [rows]="rows" [totalRecords]="coverageVariantLevelDetails.length"
+                [labelConfig]="navLabelConfig">
+            </cb-pagination-nav-handle>
+        </div>
+    </div> -->
+    </div>
+  </form>
+  <div
+    class="cb-divider cb-divider--horizontal cb-divider--theme-color-theme cb-divider--dark-color-value"
+  ></div>
+  <div class="coverage-variant-level__footer-buttons products-footer-panel">
+    <div class="coverage-variant-level__footer-buttons--left">
+      <button
+        cbButton
+        label="Back"
+        [leftIcon]="'utility-arrow-left'"
+        variant="ghost"
+        (click)="previous()"
+      ></button>
+    </div>
+    <div class="coverage-variant-level__footer-buttons--right">
+      <button
+        cbButton
+        label="Save to draft"
+        variant="secondary"
+        [colorTheme]="colorTheme"
+        (click)="saveAndExit()"
+        [disabled]="isDisabled || !isButtonEnabled"
+      ></button>
+      <button
+        cbButton
+        label="Next"
+        variant="primary"
+        [colorTheme]="colorTheme"
+        [disabled]="disableCounter || !isButtonEnabled"
+        (click)="saveAndNext()"
+      ></button>
+    </div>
+  </div>
+</div>
+
+<!--Managing deletion of the first level -->
+<cb-modal
+  [open]="openModal"
+  (closeEvent)="handleModal()"
+  title="Are you sure you want to delete? At least one coverage variant level is required"
+  message=""
+  [hideCloseIcon]="false"
+>
+  <div class="coverage-variant-level__modal-button-wrapper">
+    <button
+      cbButton
+      label="Cancel"
+      variant="secondary"
+      (click)="handleModal()"
+    ></button>
+    <button
+      cbButton
+      label="Continue"
+      variant="primary"
+      (click)="onConfirm()"
+    ></button>
+  </div>
+</cb-modal>
+
+<!-- It will trigger if the count is less than current exist coverage variant levels -->
+<cb-modal
+  [open]="openNumberOfLevelWarningModal"
+  (closeEvent)="handleNumberOfLevelsModal()"
+  title="Are you sure you want to delete?"
+  message="The given number of levels count is less than current exist coverage variant levels, you will loose data"
+  [hideCloseIcon]="false"
+>
+  <div class="coverage-variant-level__modal-button-wrapper">
+    <button
+      cbButton
+      label="Cancel"
+      variant="secondary"
+      (click)="handleNumberOfLevelsModal()"
+    ></button>
+    <button
+      cbButton
+      label="Continue"
+      variant="primary"
+      (click)="onNumberOfLevelsConfirm()"
+    ></button>
+  </div>
+</cb-modal>
+
+<cb-modal
+  [open]="openDeleteModal"
+  (closeEvent)="handleDeleteModal()"
+  title="Do you want to delete the coverage variant level?"
+  message=""
+  [hideCloseIcon]="false"
+>
+  <div class="coverage-variant-level__modal-button-wrapper">
+    <button
+      cbButton
+      label="Cancel"
+      variant="secondary"
+      (click)="handleDeleteModal()"
+    ></button>
+    <button
+      cbButton
+      label="Yes"
+      variant="primary"
+      colorTheme="default"
+      (click)="deleteConfirmation()"
+    ></button>
+  </div>
+</cb-modal>

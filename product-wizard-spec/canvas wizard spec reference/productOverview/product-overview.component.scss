@@ -1,0 +1,150 @@
+@import '../../../styles/date-picker';
+.product-overview {
+  &__container {
+    @apply cds-container cds-space-y-lg1;
+
+    &--button {
+      @apply cds-flex cds-justify-end cds-items-end cds-gap-[1.2rem];
+    }
+
+    &--head{
+      @apply cds-flex cds-justify-between cds-items-center;
+
+      &__w-auto{
+        @apply cds-w-auto;
+      }
+
+      .cb-select-choice {
+        &__label {
+          @apply cds-mb-2;
+        }
+      }
+    }
+  }
+
+   &__toggle {
+    @apply cds-mb-5 cds-pl-1;
+
+    .cb-toggle__text {
+      @apply cds-font-bold;
+    }
+
+    &-text {
+      @apply cds-font-lato cds-text-body-sm-regular-base cds-mt-1;
+    }
+  }
+
+  &__title {
+    @apply cds-font-bold cds-font-lato cds-text-2xl;
+  }
+
+  &__body {
+    &-wrapper {
+      @apply cds-flex cds-justify-center cds-items-start cds-pl-1 cds-mb-lg1 cds-space-x-lg1;
+
+      .cb-input {
+        &__label {
+          @apply cds-mb-2;
+        }
+      }
+
+      .cb-date-field {
+        &__label {
+          @apply cds-mb-2;
+        }
+      }
+
+      .cb-text-area {
+        &__label {
+          @apply cds-mb-2;
+        }
+      }
+
+      .cb-select-choice, .cb-select-multiple {
+        &__label {
+          @apply cds-mb-2;
+        }
+      }
+    }
+
+    &--button {
+      @apply cds-pt-6;
+    }
+  }
+
+  &__currency {
+    @apply cds-space-y-lg1;
+
+    &-wrapper {
+      @apply cds-flex cds-justify-start cds-items-start cds-pl-1 cds-mb-lg1 cds-space-x-lg1;
+
+      .cb-select-choice {
+        &__label {
+          @apply cds-mb-2;
+        }
+
+        // @apply cds-w-1/2;
+      }
+    }
+  }
+  &__currency-filed {
+    width: 50% !important;
+  }
+
+  &__country {
+    width: 50% !important;
+    @apply cds-flex cds-justify-center cds-items-start cds-pl-1 cds-mb-lg1 cds-space-x-lg1;
+
+    .cb-input {
+      &__label {
+        @apply cds-mb-2;
+      }
+    }
+
+    &__form-field {
+      @apply cds-flex cds-flex-col;
+    }
+  }
+
+  &__form-field {
+    .cb-select-choice {
+      &__label {
+        @apply cds-mb-2;
+      }
+    }
+  }
+
+  &__footer-buttons {
+    @apply cds-flex cds-justify-between cds-items-center cds-no-underline;
+
+    &--right {
+      @apply cds-flex;
+
+      .cb-button {
+        @apply cds-mx-2;
+      }
+    }
+
+    &--left {
+      .cb-button {
+        @apply cds-pl-0;
+      }
+    }
+  }
+  &__form-field {
+    @apply cds-flex cds-flex-col;
+  }
+  &__error-message-container {
+    @apply cds-flex cds-order-1;
+  }
+
+  &__footer-button--right {
+    @apply cds-flex cds-justify-end cds-mt-6 cds-gap-4;
+  }
+}
+
+.cb-tooltip {
+  .tippy-box {
+    @apply cds-whitespace-pre-line;
+  }
+}

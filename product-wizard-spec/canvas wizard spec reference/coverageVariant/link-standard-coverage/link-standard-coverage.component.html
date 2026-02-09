@@ -1,0 +1,55 @@
+<p-toast position="top-right" key="tr"></p-toast>
+
+<div class="link-standard__container">
+  <div>
+    <span class="link-standard__title-span">2 of 2 Coverage variant details</span>
+  </div>
+  <div class="link-standard__title">Standard coverage code allocation</div>
+
+  <div class="link-standard__search-create">
+    <div cbSearchInput styleVariant="default" colorTheme="default">
+      <div class="cb-search-input__wrapper">
+        <span class="p-inputgroup-addon">
+          <cb-icon iconKey="utility-search" [iconColor]="'neutral-400'"></cb-icon>
+        </span>
+        <p-autoComplete [showClear]="true" field="name" placeholder="Search coverage variant code">
+        </p-autoComplete>
+      </div>
+    </div>
+  </div>
+  <canvas-table [data]="coverageCodeList" [options]="options"></canvas-table>
+
+  <canvas-sidebar-form [title]="productLabels.createProduct" [visible]="showCoverageAllocationForm"
+    [fields]="coverageCodeSchema | fieldConfig" [model]="model" [submitButtonLabel]="productLabels.submitButtonLabel"
+    [cancelButtonLabel]="productLabels.cancelButtonLabel" (submitted)="onSubmit($event)"
+    (cancelled)="toggleDrawer()"></canvas-sidebar-form>
+</div>
+<div class="link-standard__icondiv">
+  <cb-icon class="link-standard__iconimage" iconKey="utility-tooltip-stroke"> </cb-icon>
+  <div class="link-standard__divnote">Please type in a numerical value. The allocation % must add up to 100%.</div>
+
+</div>
+
+<ng-container *ngIf="_showModal">
+  <cb-modal [open]="open" (closeEvent)="closeModal()" title="Do you want to delete the Coverage code" message=" "
+    [hideCloseIcon]="false">'
+    <div class="link-standard__footer-button--right">
+      <button cbButton label="Cancel" variant="secondary" (click)="closeModal()">
+      </button>
+      <button cbButton label="Yes" variant="primary" [colorTheme]=colorTheme (click)="Delete()">
+      </button>
+    </div>
+  </cb-modal>
+</ng-container>
+<div class="link-standard__footer-buttons">
+  <div class="link-standard__footer-buttons--left">
+    <button cbButton label="Back" [leftIcon]="'utility-arrow-left'" variant="ghost" (click)="previous()"></button>
+  </div>
+  <div class="link-standard__footer-buttons--right">
+    <div class="link-standard__footer-buttons--right">
+      <button cbButton label="Save & exit" variant="secondary" [colorTheme]="colorTheme" [disabled]="isDisable"
+        (click)="saveAndExit()"></button>
+      <button cbButton label="Next" variant="primary" [colorTheme]="colorTheme" [disabled]="false"
+        (click)="saveAndNext()"></button>
+    </div>
+  </div>

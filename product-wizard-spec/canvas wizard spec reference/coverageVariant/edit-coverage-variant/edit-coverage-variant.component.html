@@ -1,0 +1,205 @@
+<p-toast position="top-right" key="tr" (onClose)="navigateCoverageVariant()"></p-toast>
+<div class="edit-coverage-variant__container" *ngIf="editCoverageVariant">
+  <div class="edit-coverage-variant__content">
+    <!-- <div>
+      <span class="edit-coverage-variant__title-span"
+        >1 of 2 Coverage variant details</span
+      >
+    </div> -->
+    <div class="edit-coverage-variant__title">Coverage variant details</div>
+
+    <div class="edit-coverage-variant__content-data">
+      <form>
+        <fieldset [disabled]="fieldsetDisabled" class="edit-coverage-variant__content-data">
+          <div cbSelectChoice label="Product class" styleVariant="default" placeholder="Select">
+            <select [required]="true" required [disabled]="true" name="options" id="options"
+              [(ngModel)]="selectedProductClass" (ngModelChange)="onProductClassChange(selectedProductClass)"
+              [ngModelOptions]="{ standalone: true }">
+              <option *ngFor="let product of productClass | inputUnselect" [ngValue]="product.value"
+                [selected]="product.value === selectedProductClass">
+                {{ product.description }}
+              </option>
+            </select>
+          </div>
+
+          <div class="variant__layout">
+            <div class="edit-coverage-variant__content-data__form-field" cbInput label="Coverage variant name"
+              styleVariant="default">
+              <input placeholder="Coverage variant name" type="text" pattern=".*" maxLength="500" [required]="true"
+                required [disabled]="false" [(ngModel)]="editCoverageVariant.name"
+                [ngModelOptions]="{ standalone: true }" />
+            </div>
+
+            <button cbButton label="Coverage variant catalog" id="lblvariant" [disabled]="true" variant="primary"
+              style="width: 30%;height: 60%;border-radius: inherit;margin-top: auto;"
+              (click)="linkExistingCoverages()"></button>
+            <span class="edit-coverage-variant__tooltipbutton">
+              <cb-tooltip
+                explanationText="By clicking this button you can select from a list of existing coverage variants."
+                styleVariant="stroke" direction="above-right">
+                <cb-icon iconKey="utility-tooltip-stroke"></cb-icon>
+              </cb-tooltip>
+            </span>
+          </div>
+
+
+          <div class="variant__layout">
+            <div class="edit-coverage-variant__content-data__form-field">
+              <div cbInput label="Coverage variant ID" styleVariant="default"
+                cbTooltip="A unique 6-character value that helps identify the coverage variant."
+                tooltipStyleVariant="stroke" tooltipColorTheme="default">
+                <input placeholder="Coverage variant ID" type="text" pattern=".*" maxLength="50" [required]="true"
+                  required [disabled]="true" [(ngModel)]="editCoverageVariant.coverageVariantId"
+                  [ngModelOptions]="{ standalone: true }" />
+              </div>
+            </div>
+
+            <div cbSelectChoice label="Coverage variant type" styleVariant="default" placeholder="Select">
+              <select [required]="true" required [disabled]="false" name="options" id="options"
+                [(ngModel)]="selectedCoverageTypeValue" [ngModelOptions]="{ standalone: true }">
+                <option *ngFor="let type of coverageType | inputUnselect" [ngValue]="type.code"
+                  [selected]="type.code === selectedCoverageTypeValue">
+                  {{ type.description }}
+                </option>
+              </select>
+            </div>
+          </div>
+          <div
+          class="edit-coverage-variant__coverage-code"
+          [cbSelectMultiple]="selectMultiple"
+        >
+          <label
+            >Standard coverage code *
+            <span class="edit-coverage-variant__tooltip">
+              <cb-tooltip
+                explanationText="This dropdown provides coverage code from Genius/Meridian corresponding to the product class"
+                styleVariant="stroke"
+                direction="above-right"
+              >
+                <cb-icon iconKey="utility-tooltip-stroke"></cb-icon>
+              </cb-tooltip>
+            </span>
+          </label>
+          <p-multiSelect
+            #selectMultiple
+            [options]="standardCoverages"
+            [required]="true"
+            required
+            [disabled]="isCoverageCodeDropDown"
+            optionLabel="coverageCodeDescription"
+            placeholder="Coverage Code Multi Select"
+            inputId="#selectMultiple"
+            [(ngModel)]="selectedStandardCoverages"
+            (ngModelChange)="onCoverageCodeChange()"
+            [ngModelOptions]="{ standalone: true }"
+            [disabled]="isCoverageCode || isDisable"
+            [readonly]="isDisable"
+          ></p-multiSelect>
+        </div>
+        <div
+          class="edit-coverage-variant__chips-container"
+          *ngIf="selectedStandardCoverages.length > 0"
+        >
+          <p-chips
+            fieldVariant="stroke"
+            [(ngModel)]="standardCoverageValues"
+            (ngModelChange)="onCoverageChipStateChange($event)"
+            [ngModelOptions]="{ standalone: true }"
+            [disabled]="isDisable"
+          >
+          </p-chips>
+          <button
+            cbButton
+            label="Clear all selection"
+            [disabled]="isDisabledCoverageClear === true ? true : false"
+            variant="primary"
+            (click)="clearCoverageSelection()"
+            [disabled]="isDisable"
+          ></button>
+        </div>
+
+          <div class="edit-coverage-variant__body-wrapper">
+            <div class="edit-coverage-variant__form-field cb-input">
+              <div cbTextArea sizeVariant="large" label="Coverage variant description">
+                <textarea placeholder="Enter the product description" #covdesc pattern=".*" maxLength="1000"
+                  placeholder="Please provide a short and clear description of the coverage variant upto 1000 characters"
+                  [(ngModel)]="editCoverageVariant.description" [ngModelOptions]="{ standalone: true }"></textarea>
+              </div>
+              <div class="edit-coverage-variant__error-message-container">
+                <div>
+                  <div class="help-text-container__count">
+                    <span>Remaining characters:
+                      {{ coverageDescMaxLength - covdesc.value.length }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div [cbSelectMultiple]="selectMultipleVariant" label="Prerequisite variants">
+            <p-multiSelect #selectMultipleVariant [options]="coverageVariants" [disabled]="isVariants || isDisable"
+              optionLabel="name" placeholder="Select variants" inputId="#selectMultipleVariant"
+              [(ngModel)]="coverageVariantList" (ngModelChange)="onVariantChange()"
+              [ngModelOptions]="{ standalone: true }"></p-multiSelect>
+          </div>
+          <div class="edit-coverage-variant__chips-container" *ngIf="selectedVariantValues.length">
+            <p-chips fieldVariant="stroke" [(ngModel)]="selectedVariantValues"
+              (ngModelChange)="onChipVariantChange(selectedVariantValues)" [ngModelOptions]="{ standalone: true }"
+              [disabled]="isDisable">
+            </p-chips>
+            <button class="edit-coverage-variant__chips-clear-all" cbButton label="Clear all selection"
+              [disabled]="isDisabled === true ? true : false" variant="primary" (click)="clearSelection()"
+              [disabled]="isDisable"></button>
+          </div>
+          <!-- <div class="cb-toggle-grp__layout">
+            <div class="cb-thirdparty">
+              <div cbToggle color="default" toggleOnText="3rd party" toggleOffText="3rd party" [showIcons]="showIcons">
+                <input type="checkbox" [(ngModel)]="editCoverageVariant.is3rdParty"
+                  [ngModelOptions]="{standalone: true}" />
+              </div>
+              <cb-tooltip explanationText="Is this coverage offered by an external party?" styleVariant="stroke"
+                [colorTheme]="cbToolTipColorTheme" direction="above-right">
+                <cb-icon iconKey="utility-tooltip-stroke"></cb-icon>
+              </cb-tooltip>
+            </div>
+            <div class="cb-ratebearing">
+              <div cbToggle color="default" toggleOnText="Rate bearing" toggleOffText="Rate bearing"
+                [showIcons]="showIcons">
+                <input type="checkbox" [(ngModel)]="editCoverageVariant.isRateBearing"
+                  [ngModelOptions]="{standalone: true}" />
+              </div>
+              <cb-tooltip explanationText="Is this coverage offered by an external party?" styleVariant="stroke"
+                [colorTheme]="cbToolTipColorTheme" direction="above-right">
+                <cb-icon iconKey="utility-tooltip-stroke"></cb-icon>
+              </cb-tooltip>
+            </div>
+            <div class="cb-peril">
+              <div cbToggle color="default" toggleOnText="Peril" toggleOffText="Peril" [showIcons]="showIcons">
+                <input type="checkbox" [(ngModel)]="editCoverageVariant.isPeril"
+                  [ngModelOptions]="{standalone: true}" />
+              </div>
+              <cb-tooltip explanationText="Is this coverage offered by an external party?" styleVariant="stroke"
+                [colorTheme]="cbToolTipColorTheme" direction="above-right">
+                <cb-icon iconKey="utility-tooltip-stroke"></cb-icon>
+              </cb-tooltip>
+            </div>
+          </div> -->
+        </fieldset>
+      </form>
+      <div class="edit-coverage-variant__footer-buttons">
+        <div class="edit-coverage-variant__footer-buttons--left">
+          <button cbButton l label="Back" [leftIcon]="'utility-arrow-left'" variant="ghost"
+            (click)="previous()"></button>
+        </div>
+        <div class="edit-coverage-variant__footer-buttons--right">
+          <button cbButton label="Save & exit" variant="secondary" [colorTheme]="colorTheme" (click)="updateAndExit()"
+            [disabled]="isDisable"></button>
+          <button cbButton label="Save & next" (click)="updateAndNext()" *ngIf="!isDisableButton" variant="primary"
+            [colorTheme]="colorTheme"></button>
+
+          <button cbButton label="Next" (click)="submit()" variant="primary" *ngIf="isDisableButton"
+            [colorTheme]="colorTheme"></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

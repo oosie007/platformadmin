@@ -1,0 +1,128 @@
+<p-toast position="top-right" key="tr"></p-toast>
+<div class="coverage-variants__container">
+  <div class="coverage-variants__container--head">
+    <div class="coverage-variants__tooltip">
+      <div class="coverage-variants__title">Coverage variants</div>
+      <div class="coverage-variants__tooltiptext">
+        <cb-tooltip
+          explanationText="The details of the coverage variants defined for the product."
+          styleVariant="stroke"
+          [colorTheme]="cbToolTipColorTheme"
+          direction="above-right"
+        >
+          <cb-icon iconKey="utility-tooltip-stroke"></cb-icon>
+        </cb-tooltip>
+      </div>
+    </div>
+    <button
+      cbButton
+      label="Create"
+      variant="primary"
+      leftIcon="utility-document-edit-stroke"
+      [colorTheme]="colorTheme"
+      (click)="createCoverageVariant()"
+      [disabled]="isDisableCreateButton"
+    ></button>
+  </div>
+  <div class="coverage-variants__container--search" cbSearchInput styleVariant="default" colorTheme="default">
+    <div class="cb-search-input__wrapper">
+      <span class="p-inputgroup-addon">
+        <cb-icon
+          iconKey="utility-search"
+          [iconColor]="'neutral-400'"
+        ></cb-icon>
+      </span>
+      <p-autoComplete
+        [(ngModel)]="searchedCoverageVariant"
+        [showClear]="true"
+        field="name"
+        [suggestions]="filteredCoverageVariants"
+        (completeMethod)="searchCoverageVariant($event)"
+        placeholder="Start typing..."
+      >
+      </p-autoComplete>
+    </div>    
+  </div>
+  <canvas-table
+    [data]="coverageVariantsSummary"
+    [options]="options"
+    (selectionChanged)="onSelectedRow($event)"
+  ></canvas-table>
+
+  <canvas-sidebar-form
+    title="Clone Coverage Variant"
+    [visible]="showCloneCoverageVariant"
+    [fields]="coverageVariantSchema | fieldConfig"
+    [model]="modelClone"
+    [validateForm]="true"
+    (submitted)="onSubmitClone($event)"
+    submitButtonLabel="Clone"
+    cancelButtonLabel="Clear all"
+    (cancelled)="toggleEditDrawer()"
+  ></canvas-sidebar-form>
+  <canvas-sidebar-form
+    title="Update Allocation(%)"
+    [visible]="showUpdateAllocation"
+    [fields]="coverageVariantSchema | fieldConfig"
+    [model]="modelUpdate"
+    [validateForm]="true"
+    (submitted)="onSubmitallocation($event)"
+    submitButtonLabel="Update"
+    cancelButtonLabel="Clear all"
+    (cancelled)="toggleUpdateDrawer()"
+  ></canvas-sidebar-form>
+</div>
+
+<div class="coverage-variants__footer-buttons">
+  <div class="coverage-variants__footer-buttons--left">
+    <button
+      cbButton
+      label="Back"
+      [leftIcon]="'utility-arrow-left'"
+      variant="ghost"
+      (click)="previous()"
+    ></button>
+  </div>
+  <div class="coverage-variants__footer-buttons--right">
+    <button
+      cbButton
+      label="Save & exit"
+      variant="secondary"
+      [colorTheme]="colorTheme"
+      (click)="saveAndExit()"
+      [disabled]="isDisableButton"
+    ></button>
+    <button
+      cbButton
+      label="Next"
+      variant="primary"
+      [colorTheme]="colorTheme"
+      (click)="next()"
+      [disabled]="isDisabled"
+    ></button>
+  </div>
+</div>
+
+<cb-modal
+  [open]="openDeleteModal"
+  (closeEvent)="handleDeleteModal()"
+  title="Do you want to delete the coverage variant?"
+  message=""
+  [hideCloseIcon]="false"
+>
+  <div class="coverage-variants__modal-button-wrapper">
+    <button
+      cbButton
+      label="Cancel"
+      variant="secondary"
+      (click)="handleDeleteModal()"
+    ></button>
+    <button
+      cbButton
+      label="Yes"
+      variant="primary"
+      colorTheme="default"
+      (click)="deleteConfirmation()"
+    ></button>
+  </div>
+</cb-modal>

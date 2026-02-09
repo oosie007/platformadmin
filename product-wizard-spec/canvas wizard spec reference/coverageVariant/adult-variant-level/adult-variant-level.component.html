@@ -1,0 +1,1832 @@
+<ng-container *ngIf="!showAddInfoAccordinContainer; else secondContainer">
+  <div class="adult-variant-level__container">
+    <div class="adult-variant-level__insured-container">
+      <div class="adult-variant-level__insured-title-wrapper">
+        <div class="adult-variant-level__insured-title-container">
+          <div class="adult-variant-level__insured-title-description">
+            {{ currentInsuredTypeIndex + 1 }} {{ labels.offText }}
+            {{ selectedInsuredTypes.length }} {{ labels.insuredText }}
+          </div>
+          <div class="adult-variant-level__insured-title">{{ labels.dpadultHeaderText }}</div>
+        </div>
+        <div
+          cbSelectChoice
+          label=""
+          styleVariant="default"
+          [placeholder]="labels.copyFrom"
+        >
+          <select [formControl]="newRetrieveDataControl">
+            <option
+              *ngFor="let type of retrieveDataOptions | inputUnselect"
+              [ngValue]="type"
+            >
+              {{ type.description }}
+            </option>
+          </select>
+        </div>
+      </div>
+      <div class="adult-variant-level__insured-form">
+        <div class="adult-variant-level__insured-form_row">
+          <canvas-reactive-form
+            [reactiveFormConfig]="insuredFormConfigFields"
+            [reactiveFormModel]="insuredFormModel"
+          >
+          </canvas-reactive-form>
+        </div>
+      </div>
+    </div>
+    <div
+      class="cb-divider cb-divider--horizontal cb-divider--black-color-theme cb-divider--darkest-color-value"
+    ></div>
+    <div class="adult-variant-level__limits-title">{{ labels.insuredConfiguration }}</div>
+    <div>
+      <div class="adult-variant-level__limits-container">
+        <div class="adult-variant-level__limits-title">{{ labels.defineLimits }}</div>
+        <div class="adult-variant-level__limits-form">
+          <canvas-reactive-form
+            #limitsFormConfig
+            [reactiveFormConfig]="limitsFormConfigFields"
+            [reactiveFormModel]="limitsFormModel"
+            (selectValueChange)="onLimitsFormSelectValueChange($event)"
+          >
+          </canvas-reactive-form>
+        </div>
+        <div>
+          <div class="adult-variant-level__limits-title">
+            {{ labels.additionalConfiguration }}
+          </div>
+          <div>
+            <canvas-table [data]="tableData" [options]="options"></canvas-table>
+          </div>
+        </div>
+      </div>
+      <div class="adult-variant-level__additional-fields-container">
+        <div class="adult-variant-level__additional-fields-wrapper"></div>
+      </div>
+    </div>
+
+    <div class="adult-variant-level__footer-buttons">
+      <div class="adult-variant-level__footer-buttons--left">
+        <button
+          cbButton
+          [label]="labels.back"
+          [leftIcon]="'utility-arrow-left'"
+          variant="ghost"
+          (click)="previous()"
+        ></button>
+      </div>
+      <div class="adult-variant-level__footer-buttons--right">
+        <button
+          cbButton
+          [label]="labels.saveAndExit"
+          variant="secondary"
+          [colorTheme]="colorTheme"
+          (click)="saveAndExit()"
+          [disabled]="disableEdit || !allTableRowsHaveMaxLimit()"
+        ></button>
+        <button
+          cbButton
+          [label]="disableEdit ? labels.next : labels.saveAndNext"
+          variant="primary"
+          [colorTheme]="colorTheme"
+          (click)="saveAndNext()"
+          [disabled]="!allTableRowsHaveMaxLimit()"
+        ></button>
+      </div>
+    </div>
+  </div>
+</ng-container>
+
+<ng-template #secondContainer>
+  <div class="adult-variant-level__container">
+    <form [formGroup]="variantLevelForm">
+      <div class="adult-variant-level__insured-container">
+        <div class="adult-variant-level__insured-title-wrapper">
+          <div class="adult-variant-level__insured-title-container">
+            <div class="adult-variant-level__insured-title-description">
+              {{ currentInsuredTypeIndex + 1 }} of
+              {{ selectedInsuredTypes.length }} Coverage variant level by
+              insured type
+            </div>
+            <div class="adult-variant-level__insured-title">
+              Dependant-Adult
+            </div>
+          </div>
+          <div
+            cbSelectChoice
+            label=""
+            styleVariant="default"
+            placeholder="Copy data from"
+          >
+            <select [formControl]="retrieveDataControl">
+              <option
+                *ngFor="let type of retrieveDataOptions | inputUnselect"
+                [ngValue]="type"
+              >
+                {{ type.description }}
+              </option>
+            </select>
+          </div>
+        </div>
+        <div
+          class="adult-variant-level__insured-form"
+          formGroupName="insuredForm"
+        >
+          <div class="adult-variant-level__insured-form-row">
+            <div
+              cbInput
+              label="Coverage variant level"
+              styleVariant="default"
+              helpText=""
+            >
+              <input
+                placeholder="Coverage level"
+                type="text"
+                formControlName="coverageVaraintLevel"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="adult-variant-level__limits-container">
+          <div class="adult-variant-level__limits-title">Define limits</div>
+          <div
+            class="adult-variant-level__limits-form"
+            formGroupName="limitsForm"
+          >
+            <div class="adult-variant-level__limits-form-row">
+              <div
+                cbSelectChoice
+                label="Maximum limit type (aggregate)"
+                styleVariant="default"
+                placeholder="Aggregate limit type"
+              >
+                <select
+                  [disabled]="false"
+                  name="options"
+                  id="options"
+                  (change)="onSelectionChange()"
+                  formControlName="aggregateLimitType"
+                >
+                  <option
+                    *ngFor="let type of aggregateType | inputUnselect"
+                    [ngValue]="type.code"
+                  >
+                    {{ type.description }}
+                  </option>
+                </select>
+              </div>
+
+              <div class="cds-w-full">
+                <div
+                  cbInput
+                  class="adult-variant-level__form-field"
+                  label="Maximum value (aggregate)"
+                  styleVariant="default"
+                  helpText=""
+                  *ngIf="aggregateMaxLimitsValue !== 'PERCENTAGE'"
+                >
+                  <input
+                    placeholder="Aggregate value"
+                    type="text"
+                    pattern=".*"
+                    maxLength="50"
+                    formControlName="aggregateamountValue"
+                  />
+                </div>
+                <div
+                  class="error-text-container adult-variant-level__error-message-container"
+                  *ngIf="
+                    limitsForm?.get('aggregateamountValue')?.errors &&
+                    (limitsForm?.get('aggregateamountValue')?.dirty ||
+                      limitsForm?.get('aggregateamountValue')?.touched)
+                  "
+                >
+                  <cb-icon
+                    iconKey="utility-error-stroke"
+                    iconColor="error-shade"
+                    [iconSize]="cbIconSize.REGULAR"
+                    [addPointerClass]="false"
+                  ></cb-icon>
+                  <span
+                    class="error-text-container__error-text"
+                    *ngIf="limitsForm?.get('aggregateamountValue')?.errors?.['required']"
+                    >Maximum value (aggregate)is required</span
+                  >
+                  <span
+                    class="error-text-container__error-text"
+                    *ngIf="limitsForm?.get('aggregateamountValue')?.errors?.['pattern']"
+                    >Please enter valid number only numbers are allowed</span
+                  >
+                  <span
+                    class="error-text-container__error-text"
+                    *ngIf="limitsForm?.get('aggregateamountValue')?.errors?.['maxaggregatelimit']"
+                    >Please enter maximum limit value (aggregate) greater than
+                    maximum value (per item)</span
+                  >
+                </div>
+                <div
+                  cbInput
+                  label="Maximum value (aggregate)"
+                  styleVariant="default"
+                  helpText=""
+                  *ngIf="aggregateMaxLimitsValue === 'PERCENTAGE'"
+                >
+                  <input
+                    placeholder="Percentage of"
+                    type="text"
+                    [maxLength]="3"
+                    [max]="100"
+                    formControlName="aggregateMaxPercentOf"
+                  />
+                </div>
+                <div
+                  class="error-text-container object-variant-level__error-message-container"
+                  *ngIf="
+                    limitsForm?.get('aggregateMaxPercentOf')?.errors &&
+                    (limitsForm?.get('aggregateMaxPercentOf')?.dirty ||
+                      limitsForm?.get('aggregateMaxPercentOf')?.touched)
+                  "
+                >
+                  <cb-icon
+                    iconKey="utility-error-stroke"
+                    iconColor="error-shade"
+                    [iconSize]="cbIconSize.REGULAR"
+                    [addPointerClass]="false"
+                  ></cb-icon>
+                  <span
+                    class="error-text-container__error-text"
+                    *ngIf="limitsForm?.get('aggregateMaxPercentOf')?.errors?.['required']"
+                    >Maximum percentage of (aggregate) is required</span
+                  >
+                  <span
+                    class="error-text-container__error-text"
+                    *ngIf="limitsForm?.get('aggregateMaxPercentOf')?.errors?.['pattern']"
+                    >Please enter greater than 0</span
+                  >
+                  <span
+                    class="error-text-container__error-text"
+                    *ngIf="limitsForm?.get('aggregateMaxPercentOf')?.errors?.['maxLength']"
+                    >Maximum percentage should be 100</span
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div class="adult-variant-level__limits-form-row" *ngIf="isLimits">
+              <div class="cds-w-full">
+                <div
+                  cbSelectChoice
+                  label="Percentage"
+                  styleVariant="default"
+                  placeholder="Select coverage variant"
+                >
+                  <select
+                    [disabled]="aggregateMaxLimitsValue !== 'PERCENTAGE'"
+                    name="options"
+                    id="options"
+                    formControlName="aggregratePercentOf"
+                  >
+                    <option
+                      *ngFor="let type of coverageVariants | inputUnselect"
+                      [ngValue]="type.coverageVariantId"
+                    >
+                      {{ type.coverageVariantId }}
+                    </option>
+                  </select>
+                </div>
+                <div
+                  class="error-text-container object-variant-level__error-message-container"
+                  *ngIf="
+                    limitsForm?.get('aggregratePercentOf')?.errors &&
+                    (limitsForm?.get('aggregratePercentOf')?.dirty ||
+                      limitsForm?.get('aggregratePercentOf')?.touched)
+                  "
+                >
+                  <cb-icon
+                    iconKey="utility-error-stroke"
+                    iconColor="error-shade"
+                    [iconSize]="cbIconSize.REGULAR"
+                    [addPointerClass]="false"
+                  ></cb-icon>
+                  <span
+                    class="error-text-container__error-text"
+                    *ngIf="limitsForm?.get('aggregratePercentOf')?.errors?.['required']"
+                    >Please select percentage type</span
+                  >
+                  <span
+                    class="error-text-container__error-text"
+                    *ngIf="limitsForm?.get('aggregratePercentOf')?.errors?.['percentagerequired']"
+                  >
+                    Please select percentage type</span
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div class="adult-variant-level__limits-form-row">
+              <div
+                cbSelectChoice
+                label="Maximum limit type"
+                styleVariant="default"
+                placeholder="Maximum limit type"
+                [errorMessage]="''"
+              >
+                <select formControlName="maxLimitType">
+                  <option
+                    *ngFor="let type of minMaxTypes | inputUnselect"
+                    [ngValue]="type.code"
+                  >
+                    {{ type.description }}
+                  </option>
+                </select>
+                <div
+                  *ngIf="
+                    limitsForm?.get('maxLimitType')?.errors &&
+                    (limitsForm?.get('maxLimitType')?.dirty ||
+                      limitsForm?.get('maxLimitType')?.touched)
+                  "
+                >
+                  <div
+                    *ngIf="limitsForm?.get('maxLimitType')?.errors?.['required']"
+                  >
+                    Maximum value is required
+                  </div>
+                </div>
+              </div>
+              <div
+                class="adult-variant-level__form-field"
+                cbInput
+                label="Maximum value"
+                styleVariant="default"
+                helpText=""
+                *ngIf="maxLimitsValue !== 'Percentage'"
+                [errorMessage]="''"
+              >
+                <input
+                  placeholder="Maximum value"
+                  type="text"
+                  formControlName="amountValue"
+                />
+                <div
+                  class="error-text-container adult-variant-level__error-message-container"
+                  *ngIf="
+                    limitsForm?.get('amountValue')?.errors &&
+                    (limitsForm?.get('amountValue')?.dirty ||
+                      limitsForm?.get('amountValue')?.touched)
+                  "
+                >
+                  <cb-icon
+                    iconKey="utility-error-stroke"
+                    iconColor="error-shade"
+                    [iconSize]="cbIconSize.REGULAR"
+                    [addPointerClass]="false"
+                  ></cb-icon>
+                  <span
+                    class="error-text-container__error-text"
+                    *ngIf="limitsForm?.get('amountValue')?.errors?.['required']"
+                    >Maximum limit value is required</span
+                  >
+                  <span
+                    class="error-text-container__error-text"
+                    *ngIf="limitsForm?.get('amountValue')?.errors?.['pattern']"
+                    >Please enter valid number</span
+                  >
+                  <span
+                    class="error-text-container__error-text"
+                    *ngIf="limitsForm?.get('amountValue')?.errors?.['maxlimit']"
+                    >Please enter maximum limit value greater than minimum limit
+                    value</span
+                  >
+                </div>
+              </div>
+              <div
+                class="adult-variant-level__form-field"
+                cbInput
+                label="Percentage of"
+                styleVariant="default"
+                helpText=""
+                *ngIf="maxLimitsValue === 'Percentage'"
+                [errorMessage]="''"
+              >
+                <input
+                  placeholder="Percentage of"
+                  type="text"
+                  formControlName="percentOf"
+                />
+                <div
+                  class="error-text-container adult-variant-level__error-message-container"
+                  *ngIf="
+                    limitsForm?.get('percentOf')?.errors &&
+                    (limitsForm?.get('percentOf')?.dirty ||
+                      limitsForm?.get('percentOf')?.touched)
+                  "
+                >
+                  <cb-icon
+                    iconKey="utility-error-stroke"
+                    iconColor="error-shade"
+                    [iconSize]="cbIconSize.REGULAR"
+                    [addPointerClass]="false"
+                  ></cb-icon>
+                  <span
+                    class="error-text-container__error-text"
+                    *ngIf="limitsForm?.get('percentOf')?.errors?.['required']"
+                    >Maximum limit value is required</span
+                  >
+                  <span
+                    class="error-text-container__error-text"
+                    *ngIf="limitsForm?.get('percentOf')?.errors?.['pattern']"
+                    >Please enter valid number</span
+                  >
+                  <span
+                    class="error-text-container__error-text"
+                    *ngIf="limitsForm?.get('amountValue')?.errors?.['maxlimit']"
+                    >Please enter maximum limit value greater than minimum limit
+                    value</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="adult-variant-level__additional-fields-container">
+          <div class="adult-variant-level__additional-fields-wrapper">
+            <p-accordion>
+              <p-accordionTab header="Additional fields">
+                <div
+                  class="adult-variant-level__additional-fields-form"
+                  formGroupName="additionalFieldsForm"
+                >
+                  <div class="adult-variant-level__additional-fields-form-row">
+                    <div
+                      cbSelectChoice
+                      label="Minimum limit type"
+                      styleVariant="default"
+                      placeholder="Minimum limit type"
+                    >
+                      <select formControlName="minLimitType">
+                        <option
+                          *ngFor="let type of minMaxTypes | inputUnselect"
+                          [ngValue]="type.code"
+                        >
+                          {{ type.description }}
+                        </option>
+                      </select>
+                    </div>
+                    <div
+                      class="adult-variant-level__form-field"
+                      cbInput
+                      label="Minimum value"
+                      styleVariant="default"
+                      helpText=""
+                      [errorMessage]="''"
+                      *ngIf="minLimitsValue !== 'Percentage'"
+                    >
+                      <input
+                        placeholder="Minimum value"
+                        type="text"
+                        formControlName="amountValue"
+                      />
+                      <div
+                        class="error-text-container adult-variant-level__error-message-container"
+                        *ngIf="
+                          additionalFieldsForm?.get('amountValue')?.errors &&
+                          (additionalFieldsForm?.get('amountValue')?.dirty ||
+                            additionalFieldsForm?.get('amountValue')
+                              ?.touched) &&
+                          additionalFieldsForm?.get('minLimitType')?.value !==
+                            undefined
+                        "
+                      >
+                        <cb-icon
+                          iconKey="utility-error-stroke"
+                          iconColor="error-shade"
+                          [iconSize]="cbIconSize.REGULAR"
+                          [addPointerClass]="false"
+                        ></cb-icon>
+                        <span
+                          class="error-text-container__error-text"
+                          *ngIf="additionalFieldsForm?.get('amountValue')?.errors?.['required']"
+                          >Minimum limit value is required</span
+                        >
+                        <span
+                          class="error-text-container__error-text"
+                          *ngIf="additionalFieldsForm?.get('amountValue')?.errors?.['pattern']"
+                          >Please enter valid number</span
+                        >
+                      </div>
+                    </div>
+                    <div
+                      class="adult-variant-level__form-field"
+                      cbInput
+                      label="Percentage of"
+                      styleVariant="default"
+                      helpText=""
+                      [errorMessage]="''"
+                      *ngIf="minLimitsValue === 'Percentage'"
+                    >
+                      <input
+                        placeholder="Percentage of"
+                        type="text"
+                        formControlName="percentOf"
+                      />
+                      <div
+                        class="error-text-container adult-variant-level__error-message-container"
+                        *ngIf="
+                          additionalFieldsForm?.get(
+                            'additionalFieldsForm.percentOf'
+                          )?.errors &&
+                          (additionalFieldsForm?.get(
+                            'additionalFieldsForm.percentOf'
+                          )?.dirty ||
+                            additionalFieldsForm?.get(
+                              'additionalFieldsForm.percentOf'
+                            )?.touched)
+                        "
+                      >
+                        <cb-icon
+                          iconKey="utility-error-stroke"
+                          iconColor="error-shade"
+                          [iconSize]="cbIconSize.REGULAR"
+                          [addPointerClass]="false"
+                        ></cb-icon>
+                        <span
+                          class="error-text-container__error-text"
+                          *ngIf="additionalFieldsForm?.get('additionalFieldsForm.percentOf')?.errors?.['required']"
+                          >Minimum limit value is required</span
+                        >
+                        <span
+                          class="error-text-container__error-text"
+                          *ngIf="additionalFieldsForm?.get('additionalFieldsForm.percentOf')?.errors?.['pattern']"
+                          >Please enter valid number</span
+                        >
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="adult-variant-level__additional-fields-form-row">
+                    <div
+                      cbSelectChoice
+                      label="Duration type"
+                      styleVariant="default"
+                      placeholder="Duration type"
+                    >
+                      <select formControlName="durationType">
+                        <option
+                          *ngFor="let type of durationTypes | inputUnselect"
+                          [ngValue]="type.code"
+                        >
+                          {{ type.description }}
+                        </option>
+                      </select>
+                    </div>
+                    <div
+                      class="adult-variant-level__form-field"
+                      cbInput
+                      label="Duration value"
+                      styleVariant="default"
+                      helpText=""
+                      [errorMessage]="''"
+                    >
+                      <input
+                        placeholder="Duration value"
+                        type="text"
+                        formControlName="durationValue"
+                      />
+                      <div
+                        class="error-text-container adult-variant-level__error-message-container"
+                        *ngIf="
+                          additionalFieldsForm?.get('durationValue')?.errors &&
+                          (additionalFieldsForm?.get('durationValue')?.dirty ||
+                            additionalFieldsForm?.get('durationValue')
+                              ?.touched) &&
+                          additionalFieldsForm?.get('durationType')?.value !==
+                            undefined
+                        "
+                      >
+                        <cb-icon
+                          iconKey="utility-error-stroke"
+                          iconColor="error-shade"
+                          [iconSize]="cbIconSize.REGULAR"
+                          [addPointerClass]="false"
+                        ></cb-icon>
+                        <span
+                          class="error-text-container__error-text"
+                          *ngIf="additionalFieldsForm?.get('durationValue')?.errors?.['required']"
+                          >Duration value is required</span
+                        >
+                        <span
+                          class="error-text-container__error-text"
+                          *ngIf="additionalFieldsForm?.get('durationValue')?.errors?.['pattern']"
+                          >Please enter valid number</span
+                        >
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="adult-variant-level__additional-fields-form-row">
+                    <div
+                      cbSelectChoice
+                      label="Limit scope"
+                      styleVariant="default"
+                      placeholder="Limit scope"
+                    >
+                      <select formControlName="limitScope">
+                        <option
+                          *ngFor="let type of limitScopes | inputUnselect"
+                          [ngValue]="type.code"
+                        >
+                          {{ type.description }}
+                        </option>
+                      </select>
+                    </div>
+                    <div
+                      class="adult-variant-level__form-field"
+                      cbInput
+                      label="Scope value"
+                      styleVariant="default"
+                      helpText=""
+                      [errorMessage]="''"
+                    >
+                      <input
+                        placeholder="Scope value"
+                        type="text"
+                        formControlName="scopeValue"
+                      />
+                      <div
+                        class="error-text-container adult-variant-level__error-message-container"
+                        *ngIf="
+                          additionalFieldsForm?.get('scopeValue')?.errors &&
+                          (additionalFieldsForm?.get('scopeValue')?.dirty ||
+                            additionalFieldsForm?.get('scopeValue')?.touched) &&
+                          additionalFieldsForm?.get('limitScope')?.value !==
+                            undefined
+                        "
+                      >
+                        <cb-icon
+                          iconKey="utility-error-stroke"
+                          iconColor="error-shade"
+                          [iconSize]="cbIconSize.REGULAR"
+                          [addPointerClass]="false"
+                        ></cb-icon>
+                        <span
+                          class="error-text-container__error-text"
+                          *ngIf="additionalFieldsForm?.get('scopeValue')?.errors?.['required']"
+                          >Scope value is required</span
+                        >
+                        <span
+                          class="error-text-container__error-text"
+                          *ngIf="additionalFieldsForm?.get('scopeValue')?.errors?.['pattern']"
+                          >Please enter valid number</span
+                        >
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="adult-variant-level__additional-fields-form-row">
+                    <div
+                      cbSelectChoice
+                      label="Waiting period"
+                      styleVariant="default"
+                      placeholder="Waiting period"
+                    >
+                      <select formControlName="waitingPeriod">
+                        <option
+                          *ngFor="let type of waitingPeriodList | inputUnselect"
+                          [ngValue]="type.code"
+                        >
+                          {{ type.description }}
+                        </option>
+                      </select>
+                    </div>
+                    <div
+                      class="adult-variant-level__form-field"
+                      cbInput
+                      label="Waiting period value"
+                      styleVariant="default"
+                      helpText=""
+                      [errorMessage]="''"
+                    >
+                      <input
+                        placeholder="Waiting period value"
+                        type="text"
+                        formControlName="waitingPeriodValue"
+                      />
+                      <div
+                        class="error-text-container adult-variant-level__error-message-container"
+                        *ngIf="
+                          additionalFieldsForm?.get('waitingPeriodValue')
+                            ?.errors &&
+                          (additionalFieldsForm?.get('waitingPeriodValue')
+                            ?.dirty ||
+                            additionalFieldsForm?.get('waitingPeriodValue')
+                              ?.touched) &&
+                          additionalFieldsForm?.get('waitingPeriod')?.value !==
+                            undefined
+                        "
+                      >
+                        <cb-icon
+                          iconKey="utility-error-stroke"
+                          iconColor="error-shade"
+                          [iconSize]="cbIconSize.REGULAR"
+                          [addPointerClass]="false"
+                        ></cb-icon>
+                        <span
+                          class="error-text-container__error-text"
+                          *ngIf="additionalFieldsForm?.get('waitingPeriodValue')?.errors?.['required']"
+                          >Scope value is required</span
+                        >
+                        <span
+                          class="error-text-container__error-text"
+                          *ngIf="additionalFieldsForm?.get('waitingPeriodValue')?.errors?.['pattern']"
+                          >Please enter valid number</span
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  class="adult-variant-level__deductibles-form"
+                  formGroupName="deductiblesForm"
+                >
+                  <div class="adult-variant-level__deductibles-title">
+                    Define deductibles
+                  </div>
+                  <div class="adult-variant-level__additional-fields-form-row">
+                    <div
+                      cbSelectChoice
+                      label="Deductible type"
+                      styleVariant="default"
+                      placeholder="Deductible type"
+                    >
+                      <select formControlName="deductibleType">
+                        <option
+                          *ngFor="let type of deductibleTypes | inputUnselect"
+                          [ngValue]="type.code"
+                        >
+                          {{ type.description }}
+                        </option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="adult-variant-level__additional-fields-form-row">
+                    <div
+                      class="adult-variant-level__form-field"
+                      cbSelectChoice
+                      label="Value type"
+                      styleVariant="default"
+                      placeholder="Value type"
+                    >
+                      <select formControlName="valueType">
+                        <option
+                          *ngFor="
+                            let type of deductibleValueTypes | inputUnselect
+                          "
+                          [ngValue]="type.code"
+                        >
+                          {{ type.description }}
+                        </option>
+                      </select>
+                      <div
+                        class="error-text-container adult-variant-level__error-message-container"
+                        *ngIf="
+                          deductiblesForm?.get('valueType')?.errors &&
+                          (deductiblesForm?.get('valueType')?.dirty ||
+                            deductiblesForm?.get('valueType')?.touched)
+                        "
+                      >
+                        <cb-icon
+                          iconKey="utility-error-stroke"
+                          iconColor="error-shade"
+                          [iconSize]="cbIconSize.REGULAR"
+                          [addPointerClass]="false"
+                        ></cb-icon>
+                        <span
+                          class="error-text-container__error-text"
+                          *ngIf="deductiblesForm?.get('valueType')?.errors?.['required']"
+                          >Value type is required</span
+                        >
+                      </div>
+                    </div>
+                    <div
+                      class="adult-variant-level__form-field"
+                      cbInput
+                      label="Value"
+                      styleVariant="default"
+                      helpText=""
+                      [errorMessage]="''"
+                    >
+                      <input
+                        placeholder="Value"
+                        type="text"
+                        formControlName="amountValue"
+                      />
+                      <div
+                        class="error-text-container adult-variant-level__error-message-container"
+                        *ngIf="
+                          deductiblesForm?.get('amountValue')?.errors &&
+                          (deductiblesForm?.get('amountValue')?.dirty ||
+                            deductiblesForm?.get('amountValue')?.touched) &&
+                          deductiblesForm?.get('valueType')?.value !== undefined
+                        "
+                      >
+                        <cb-icon
+                          iconKey="utility-error-stroke"
+                          iconColor="error-shade"
+                          [iconSize]="cbIconSize.REGULAR"
+                          [addPointerClass]="false"
+                        ></cb-icon>
+                        <span
+                          class="error-text-container__error-text"
+                          *ngIf="deductiblesForm?.get('amountValue')?.errors?.['required']"
+                          >Value is required</span
+                        >
+                        <span
+                          class="error-text-container__error-text"
+                          *ngIf="deductiblesForm?.get('amountValue')?.errors?.['pattern']"
+                          >Please enter valid number</span
+                        >
+                      </div>
+                    </div>
+                  </div>
+                  <div class="adult-variant-level__additional-fields-form-row">
+                    <div
+                      class="adult-variant-level__form-field"
+                      cbSelectChoice
+                      label="Percentage"
+                      styleVariant="default"
+                      placeholder="Percentage"
+                      *ngIf="
+                        deductiblesValue === DeductibleValueTypes.PERCENTAGE
+                      "
+                    >
+                      <select
+                        [disabled]="false"
+                        name="options"
+                        id="options"
+                        formControlName="percentOf"
+                      >
+                        <option
+                          *ngFor="let type of percentValueTypes"
+                          [ngValue]="type.code"
+                        >
+                          {{ type.description }}
+                        </option>
+                      </select>
+                      <div
+                        class="error-text-container adult-variant-level__error-message-container"
+                        *ngIf="
+                          deductiblesForm?.get('percentOf')?.errors &&
+                          (deductiblesForm?.get('percentOf')?.dirty ||
+                            deductiblesForm?.get('percentOf')?.touched)
+                        "
+                      >
+                        <cb-icon
+                          iconKey="utility-error-stroke"
+                          iconColor="error-shade"
+                          [iconSize]="cbIconSize.REGULAR"
+                          [addPointerClass]="false"
+                        ></cb-icon>
+                        <span
+                          class="error-text-container__error-text"
+                          *ngIf="deductiblesForm?.get('percentOf')?.errors?.['required']"
+                          >Percentage is required</span
+                        >
+                        <span
+                          class="error-text-container__error-text"
+                          *ngIf="deductiblesForm?.get('percentOf')?.errors?.['pattern']"
+                          >Please enter valid number</span
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </p-accordionTab>
+            </p-accordion>
+          </div>
+        </div>
+      </div>
+
+      <div class="adult-variant-level__sub-coverages-wrapper">
+        <div formGroupName="subCoveragesForm">
+          <div
+            formArrayName="subCoverage"
+            class="adult-variant-level__sub-coverages-form-array"
+            *ngFor="let attribute of formArray?.controls; let i = index"
+          >
+            <div
+              [formGroupName]="i"
+              class="adult-variant-level__sub-coverages-form-group"
+            >
+              <div
+                class="adult-variant-level__sub-coverages-form-title-wrapper"
+              >
+                <div class="adult-variant-level__sub-coverages-form-title">
+                  {{ 'Sub coverage ' + (i + 1) }}
+                </div>
+                <div class="adult-variant-level__sub-coverages-form-icons">
+                  <cb-icon
+                    iconKey="utility-add"
+                    [iconSize]="cbIconSize.LARGE"
+                    [addPointerClass]="true"
+                    *ngIf="
+                      formArray.length > 0 &&
+                      subCoverageList &&
+                      subCoverageList.length > 0 &&
+                      formArray.length < subCoverageList.length
+                    "
+                    (click)="cloneSubCoverage(i, formArray.controls[i])"
+                  ></cb-icon>
+                  <cb-icon
+                    iconKey="utility-trash-fill"
+                    iconColor="error-saturated"
+                    [iconSize]="cbIconSize.LARGE"
+                    [addPointerClass]="true"
+                    *ngIf="formArray.length > 0"
+                    (click)="removeSubCoverage(i)"
+                  ></cb-icon>
+                </div>
+              </div>
+              <div
+                label="Select sub coverage"
+                styleVariant="default"
+                formGroupName="subCoverageForm"
+                placeholder="Sub coverage"
+                class="cb-select-choice"
+              >
+                <label class="cb-input__label">Select sub coverage</label>
+                <select
+                  formControlName="selectSubCoverage"
+                  (change)="updateSubCoverageList()"
+                  class="cb-select-choice__base-select cb-select-choice__custom-select"
+                >
+                  <option
+                    class="adult-variant-level__sub-coverages-form-option"
+                    *ngFor="let item of subCoverageList"
+                    [disabled]="item.selected"
+                    [ngValue]="item.subCoverId"
+                    [selected]="
+                      item.subCoverId ===
+                      attribute?.get('selectSubCoverage')?.value
+                    "
+                  >
+                    {{ item.name }}
+                  </option>
+                </select>
+              </div>
+
+              <div>
+                <div class="adult-variant-level__limits-container">
+                  <div class="adult-variant-level__limits-title">
+                    Define limits
+                  </div>
+                  <div
+                    class="adult-variant-level__limits-form"
+                    formGroupName="limitsForm"
+                  >
+                    <div class="adult-variant-level__limits-form-row">
+                      <div
+                        cbSelectChoice
+                        label="Maximum limit type"
+                        styleVariant="default"
+                        placeholder="Maximum limit type"
+                        class="cb-select-choice"
+                      >
+                        <label class="cb-input__label"
+                          >Maximum limit type</label
+                        >
+                        <select
+                          formControlName="maxLimitType"
+                          class="cb-select-choice__base-select cb-select-choice__custom-select"
+                        >
+                          <option
+                            *ngFor="let type of minMaxTypes | inputUnselect"
+                            [ngValue]="type.code"
+                          >
+                            {{ type.description }}
+                          </option>
+                        </select>
+                        <div
+                          *ngIf="
+                            attribute?.get('limitsForm.maxLimitType')?.errors &&
+                            (attribute?.get('limitsForm.maxLimitType')?.dirty ||
+                              attribute?.get('limitsForm.maxLimitType')
+                                ?.touched)
+                          "
+                        >
+                          <div
+                            *ngIf="attribute?.get('limitsForm.maxLimitType')?.errors?.['required']"
+                          >
+                            Maximum value is required
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        class="adult-variant-level__form-field"
+                        cbInput
+                        label="Maximum value"
+                        styleVariant="default"
+                        helpText=""
+                        *ngIf="maxLimitsValue !== 'Percentage'"
+                        [errorMessage]="''"
+                      >
+                        <input
+                          placeholder="Maximum value"
+                          type="text"
+                          formControlName="amountValue"
+                        />
+                        <div
+                          class="error-text-container adult-variant-level__error-message-container"
+                          *ngIf="
+                            attribute?.get('limitsForm.amountValue')?.errors &&
+                            (attribute?.get('limitsForm.amountValue')?.dirty ||
+                              attribute?.get('limitsForm.amountValue')?.touched)
+                          "
+                        >
+                          <cb-icon
+                            iconKey="utility-error-stroke"
+                            iconColor="error-shade"
+                            [iconSize]="cbIconSize.REGULAR"
+                            [addPointerClass]="false"
+                          ></cb-icon>
+                          <span
+                            class="error-text-container__error-text"
+                            *ngIf="attribute?.get('limitsForm.amountValue')?.errors?.['required']"
+                            >Maximum limit value is required</span
+                          >
+                          <span
+                            class="error-text-container__error-text"
+                            *ngIf="attribute?.get('limitsForm.amountValue')?.errors?.['pattern']"
+                            >Please enter valid number</span
+                          >
+                          <span
+                            class="error-text-container__error-text"
+                            *ngIf="attribute?.get('limitsForm.amountValue')?.errors?.['maxlimit']"
+                            >Please enter maximum limit value greater than
+                            minimum limit value</span
+                          >
+                        </div>
+                      </div>
+                      <div
+                        class="adult-variant-level__form-field"
+                        cbInput
+                        label="Percentage of"
+                        styleVariant="default"
+                        helpText=""
+                        *ngIf="maxLimitsValue === 'Percentage'"
+                        [errorMessage]="''"
+                      >
+                        <input
+                          placeholder="Percentage of"
+                          type="text"
+                          formControlName="percentOf"
+                        />
+                        <div
+                          class="error-text-container adult-variant-level__error-message-container"
+                          *ngIf="
+                            attribute?.get('limitsForm.percentOf')?.errors &&
+                            (attribute?.get('limitsForm.percentOf')?.dirty ||
+                              attribute?.get('limitsForm.percentOf')?.touched)
+                          "
+                        >
+                          <cb-icon
+                            iconKey="utility-error-stroke"
+                            iconColor="error-shade"
+                            [iconSize]="cbIconSize.REGULAR"
+                            [addPointerClass]="false"
+                          ></cb-icon>
+                          <span
+                            class="error-text-container__error-text"
+                            *ngIf="attribute?.get('limitsForm.percentOf')?.errors?.['required']"
+                            >Maximum limit value is required</span
+                          >
+                          <span
+                            class="error-text-container__error-text"
+                            *ngIf="attribute?.get('limitsForm.percentOf')?.errors?.['pattern']"
+                            >Please enter valid number</span
+                          >
+                          <span
+                            class="error-text-container__error-text"
+                            *ngIf="attribute?.get('limitsForm.percentOf')?.errors?.['maxlimit']"
+                            >Please enter maximum limit value greater than
+                            minimum limit value</span
+                          >
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="adult-variant-level__additional-fields-container">
+                  <div class="adult-variant-level__additional-fields-wrapper">
+                    <p-accordion>
+                      <p-accordionTab header="Additional Fields">
+                        <div
+                          class="adult-variant-level__additional-fields-form"
+                          formGroupName="additionalFieldsForm"
+                        >
+                          <div
+                            class="adult-variant-level__additional-fields-form-row"
+                          >
+                            <div
+                              cbSelectChoice
+                              [errorMessage]="''"
+                              label="Minimum limit type"
+                              styleVariant="default"
+                              placeholder="Minimum limit type"
+                              class="cb-select-choice"
+                            >
+                              <label class="cb-input__label"
+                                >Minimum limit type</label
+                              >
+                              <select
+                                formControlName="minLimitType"
+                                class="cb-select-choice__base-select cb-select-choice__custom-select"
+                              >
+                                <option
+                                  *ngFor="
+                                    let type of minMaxTypes | inputUnselect
+                                  "
+                                  [ngValue]="type.code"
+                                >
+                                  {{ type.description }}
+                                </option>
+                              </select>
+                              <div
+                                *ngIf="
+                                  attribute?.get(
+                                    'additionalFieldsForm.minLimitType'
+                                  )?.errors &&
+                                  (attribute?.get(
+                                    'additionalFieldsForm.minLimitType'
+                                  )?.dirty ||
+                                    attribute?.get(
+                                      'additionalFieldsForm.minLimitType'
+                                    )?.touched)
+                                "
+                              >
+                                <div
+                                  *ngIf="attribute?.get('additionalFieldsForm.minLimitType')?.errors?.['required']"
+                                >
+                                  Minimum limit type is required
+                                </div>
+                              </div>
+                            </div>
+                            <div
+                              class="adult-variant-level__form-field"
+                              cbInput
+                              label="Minimum value"
+                              styleVariant="default"
+                              helpText=""
+                              [errorMessage]="''"
+                              *ngIf="minLimitsValue !== 'Percentage'"
+                            >
+                              <input
+                                placeholder="Minimum value"
+                                type="text"
+                                formControlName="amountValue"
+                              />
+                              <div
+                                class="error-text-container adult-variant-level__error-message-container"
+                                *ngIf="
+                                  attribute?.get(
+                                    'additionalFieldsForm.amountValue'
+                                  )?.errors &&
+                                  (attribute?.get(
+                                    'additionalFieldsForm.amountValue'
+                                  )?.dirty ||
+                                    attribute?.get(
+                                      'additionalFieldsForm.amountValue'
+                                    )?.touched)
+                                "
+                              >
+                                <cb-icon
+                                  iconKey="utility-error-stroke"
+                                  iconColor="error-shade"
+                                  [iconSize]="cbIconSize.REGULAR"
+                                  [addPointerClass]="false"
+                                ></cb-icon>
+                                <span
+                                  class="error-text-container__error-text"
+                                  *ngIf="attribute?.get('additionalFieldsForm.amountValue')?.errors?.['required']"
+                                  >Minimum limit value is required</span
+                                >
+                                <span
+                                  class="error-text-container__error-text"
+                                  *ngIf="attribute?.get('additionalFieldsForm.amountValue')?.errors?.['pattern']"
+                                  >Please enter valid number</span
+                                >
+                              </div>
+                            </div>
+                            <div
+                              class="adult-variant-level__form-field"
+                              cbInput
+                              label="Percentage of"
+                              styleVariant="default"
+                              helpText=""
+                              [errorMessage]="''"
+                              *ngIf="minLimitsValue === 'Percentage'"
+                            >
+                              <input
+                                placeholder="Percentage of"
+                                type="text"
+                                formControlName="percentOf"
+                              />
+                              <div
+                                class="error-text-container adult-variant-level__error-message-container"
+                                *ngIf="
+                                  attribute?.get(
+                                    'additionalFieldsForm.percentOf'
+                                  )?.errors &&
+                                  (attribute?.get(
+                                    'additionalFieldsForm.percentOf'
+                                  )?.dirty ||
+                                    attribute?.get(
+                                      'additionalFieldsForm.percentOf'
+                                    )?.touched)
+                                "
+                              >
+                                <cb-icon
+                                  iconKey="utility-error-stroke"
+                                  iconColor="error-shade"
+                                  [iconSize]="cbIconSize.REGULAR"
+                                  [addPointerClass]="false"
+                                ></cb-icon>
+                                <span
+                                  class="error-text-container__error-text"
+                                  *ngIf="attribute?.get('additionalFieldsForm.percentOf')?.errors?.['required']"
+                                  >Minimum limit value is required</span
+                                >
+                                <span
+                                  class="error-text-container__error-text"
+                                  *ngIf="attribute?.get('additionalFieldsForm.percentOf')?.errors?.['pattern']"
+                                  >Please enter valid number</span
+                                >
+                              </div>
+                            </div>
+                          </div>
+
+                          <div
+                            class="adult-variant-level__additional-fields-form-row"
+                          >
+                            <div
+                              cbSelectChoice
+                              [errorMessage]="''"
+                              label="Duration type"
+                              styleVariant="default"
+                              placeholder="Duration type"
+                              class="cb-select-choice"
+                            >
+                              <label class="cb-input__label"
+                                >Duration type</label
+                              >
+                              <select
+                                formControlName="durationType"
+                                class="cb-select-choice__base-select cb-select-choice__custom-select"
+                              >
+                                <option
+                                  *ngFor="
+                                    let type of durationTypes | inputUnselect
+                                  "
+                                  [ngValue]="type.code"
+                                >
+                                  {{ type.description }}
+                                </option>
+                              </select>
+                            </div>
+                            <div
+                              class="adult-variant-level__form-field"
+                              cbInput
+                              label="Duration value"
+                              styleVariant="default"
+                              helpText=""
+                              [errorMessage]="''"
+                            >
+                              <input
+                                placeholder="Duration value"
+                                type="text"
+                                formControlName="durationValue"
+                              />
+                              <div
+                                class="error-text-container adult-variant-level__error-message-container"
+                                *ngIf="
+                                  attribute?.get(
+                                    'additionalFieldsForm.durationValue'
+                                  )?.errors &&
+                                  (attribute?.get(
+                                    'additionalFieldsForm.durationValue'
+                                  )?.dirty ||
+                                    attribute?.get(
+                                      'additionalFieldsForm.durationValue'
+                                    )?.touched)
+                                "
+                              >
+                                <cb-icon
+                                  iconKey="utility-error-stroke"
+                                  iconColor="error-shade"
+                                  [iconSize]="cbIconSize.REGULAR"
+                                  [addPointerClass]="false"
+                                ></cb-icon>
+                                <span
+                                  class="error-text-container__error-text"
+                                  *ngIf="attribute?.get('additionalFieldsForm.durationValue')?.errors?.['required']"
+                                  >Duration value is required</span
+                                >
+                                <span
+                                  class="error-text-container__error-text"
+                                  *ngIf="attribute?.get('additionalFieldsForm.durationValue')?.errors?.['pattern']"
+                                  >Please enter valid number</span
+                                >
+                              </div>
+                            </div>
+                          </div>
+
+                          <div
+                            class="adult-variant-level__additional-fields-form-row"
+                          >
+                            <div
+                              cbSelectChoice
+                              [errorMessage]="''"
+                              label="Limit scope"
+                              styleVariant="default"
+                              placeholder="Limit scope"
+                              class="cb-select-choice"
+                            >
+                              <label class="cb-input__label">Limit scope</label>
+                              <select
+                                formControlName="limitScope"
+                                class="cb-select-choice__base-select cb-select-choice__custom-select"
+                              >
+                                <option
+                                  *ngFor="
+                                    let type of limitScopes | inputUnselect
+                                  "
+                                  [ngValue]="type.code"
+                                >
+                                  {{ type.description }}
+                                </option>
+                              </select>
+                            </div>
+                            <div
+                              class="adult-variant-level__form-field"
+                              cbInput
+                              label="Scope value"
+                              styleVariant="default"
+                              helpText=""
+                              [errorMessage]="''"
+                            >
+                              <input
+                                placeholder="Scope value"
+                                type="text"
+                                formControlName="scopeValue"
+                              />
+                              <div
+                                class="error-text-container adult-variant-level__error-message-container"
+                                *ngIf="
+                                  attribute?.get(
+                                    'additionalFieldsForm.scopeValue'
+                                  )?.errors &&
+                                  (attribute?.get(
+                                    'additionalFieldsForm.scopeValue'
+                                  )?.dirty ||
+                                    attribute?.get(
+                                      'additionalFieldsForm.scopeValue'
+                                    )?.touched)
+                                "
+                              >
+                                <cb-icon
+                                  iconKey="utility-error-stroke"
+                                  iconColor="error-shade"
+                                  [iconSize]="cbIconSize.REGULAR"
+                                  [addPointerClass]="false"
+                                ></cb-icon>
+                                <span
+                                  class="error-text-container__error-text"
+                                  *ngIf="attribute?.get('additionalFieldsForm.scopeValue')?.errors?.['required']"
+                                  >Scope value is required</span
+                                >
+                                <span
+                                  class="error-text-container__error-text"
+                                  *ngIf="attribute?.get('additionalFieldsForm.scopeValue')?.errors?.['pattern']"
+                                  >Please enter valid number</span
+                                >
+                              </div>
+                            </div>
+                          </div>
+
+                          <div
+                            class="adult-variant-level__additional-fields-form-row"
+                          >
+                            <div
+                              cbSelectChoice
+                              [errorMessage]="''"
+                              label="Waiting period"
+                              styleVariant="default"
+                              placeholder="Waiting period"
+                              class="cb-select-choice"
+                            >
+                              <label class="cb-input__label"
+                                >Waiting period</label
+                              >
+                              <select
+                                formControlName="waitingPeriod"
+                                class="cb-select-choice__base-select cb-select-choice__custom-select"
+                              >
+                                <option
+                                  *ngFor="
+                                    let type of waitingPeriodList
+                                      | inputUnselect
+                                  "
+                                  [ngValue]="type.code"
+                                >
+                                  {{ type.description }}
+                                </option>
+                              </select>
+                            </div>
+                            <div
+                              class="adult-variant-level__form-field"
+                              cbInput
+                              label="Waiting period value"
+                              styleVariant="default"
+                              helpText=""
+                              [errorMessage]="''"
+                            >
+                              <input
+                                placeholder="Waiting period value"
+                                type="text"
+                                formControlName="waitingPeriodValue"
+                              />
+                              <div
+                                class="error-text-container adult-variant-level__error-message-container"
+                                *ngIf="
+                                  attribute?.get(
+                                    'additionalFieldsForm.waitingPeriodValue'
+                                  )?.errors &&
+                                  (attribute?.get(
+                                    'additionalFieldsForm.waitingPeriodValue'
+                                  )?.dirty ||
+                                    attribute?.get(
+                                      'additionalFieldsForm.waitingPeriodValue'
+                                    )?.touched)
+                                "
+                              >
+                                <cb-icon
+                                  iconKey="utility-error-stroke"
+                                  iconColor="error-shade"
+                                  [iconSize]="cbIconSize.REGULAR"
+                                  [addPointerClass]="false"
+                                ></cb-icon>
+                                <span
+                                  class="error-text-container__error-text"
+                                  *ngIf="attribute?.get('additionalFieldsForm.waitingPeriodValue')?.errors?.['required']"
+                                  >Waiting period value is required</span
+                                >
+                                <span
+                                  class="error-text-container__error-text"
+                                  *ngIf="attribute?.get('additionalFieldsForm.waitingPeriodValue')?.errors?.['pattern']"
+                                  >Please enter valid number</span
+                                >
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div
+                          class="adult-variant-level__deductibles-form"
+                          formGroupName="deductiblesForm"
+                        >
+                          <div class="adult-variant-level__deductibles-title">
+                            Define deductibles
+                          </div>
+                          <div
+                            class="adult-variant-level__additional-fields-form-row"
+                          >
+                            <div
+                              cbSelectChoice
+                              [errorMessage]="''"
+                              label="Deductible type"
+                              styleVariant="default"
+                              placeholder="Deductible type"
+                              class="cb-select-choice"
+                            >
+                              <label class="cb-input__label"
+                                >Deductible type</label
+                              >
+                              <select
+                                formControlName="deductibleType"
+                                class="cb-select-choice__base-select cb-select-choice__custom-select"
+                              >
+                                <option
+                                  *ngFor="
+                                    let type of deductibleTypes | inputUnselect
+                                  "
+                                  [ngValue]="type.code"
+                                >
+                                  {{ type.description }}
+                                </option>
+                              </select>
+                            </div>
+                          </div>
+
+                          <div
+                            class="adult-variant-level__additional-fields-form-row"
+                          >
+                            <div
+                              class="adult-variant-level__form-field"
+                              cbSelectChoice
+                              [errorMessage]="''"
+                              label="Value type"
+                              styleVariant="default"
+                              placeholder="Value type"
+                              class="cb-select-choice"
+                            >
+                              <label class="cb-input__label">Value type</label>
+                              <select
+                                formControlName="valueType"
+                                class="cb-select-choice__base-select cb-select-choice__custom-select"
+                              >
+                                <option
+                                  *ngFor="let type of minMaxTypes"
+                                  [ngValue]="type.code"
+                                >
+                                  {{ type.description }}
+                                </option>
+                              </select>
+                              <div
+                                class="error-text-container adult-variant-level__error-message-container"
+                                *ngIf="
+                                  attribute?.get('deductiblesForm.valueType')
+                                    ?.errors &&
+                                  (attribute?.get('deductiblesForm.valueType')
+                                    ?.dirty ||
+                                    attribute?.get('deductiblesForm.valueType')
+                                      ?.touched)
+                                "
+                              >
+                                <cb-icon
+                                  iconKey="utility-error-stroke"
+                                  iconColor="error-shade"
+                                  [iconSize]="cbIconSize.REGULAR"
+                                  [addPointerClass]="false"
+                                ></cb-icon>
+                                <span
+                                  class="error-text-container__error-text"
+                                  *ngIf="attribute?.get('deductiblesForm.valueType')?.errors?.['required']"
+                                  >Value type is required</span
+                                >
+                              </div>
+                            </div>
+                            <div
+                              class="adult-variant-level__form-field"
+                              cbInput
+                              label="Value"
+                              styleVariant="default"
+                              helpText=""
+                              [errorMessage]="''"
+                              *ngIf="deductiblesValue !== 'Percentage'"
+                            >
+                              <input
+                                placeholder="Value"
+                                type="text"
+                                formControlName="amountValue"
+                              />
+                              <div
+                                class="error-text-container adult-variant-level__error-message-container"
+                                *ngIf="
+                                  attribute?.get('deductiblesForm.amountValue')
+                                    ?.errors &&
+                                  (attribute?.get('deductiblesForm.amountValue')
+                                    ?.dirty ||
+                                    attribute?.get(
+                                      'deductiblesForm.amountValue'
+                                    )?.touched)
+                                "
+                              >
+                                <cb-icon
+                                  iconKey="utility-error-stroke"
+                                  iconColor="error-shade"
+                                  [iconSize]="cbIconSize.REGULAR"
+                                  [addPointerClass]="false"
+                                ></cb-icon>
+                                <span
+                                  class="error-text-container__error-text"
+                                  *ngIf="attribute?.get('deductiblesForm.amountValue')?.errors?.['required']"
+                                  >Value is required</span
+                                >
+                                <span
+                                  class="error-text-container__error-text"
+                                  *ngIf="attribute?.get('deductiblesForm.amountValue')?.errors?.['pattern']"
+                                  >Please enter valid number</span
+                                >
+                              </div>
+                            </div>
+
+                            <div
+                              class="adult-variant-level__form-field"
+                              cbInput
+                              label="Percentage of"
+                              styleVariant="default"
+                              helpText=""
+                              [errorMessage]="''"
+                              *ngIf="deductiblesValue === 'Percentage'"
+                            >
+                              <input
+                                placeholder="Percentage of"
+                                type="text"
+                                formControlName="percentOf"
+                              />
+                              <div
+                                class="error-text-container adult-variant-level__error-message-container"
+                                *ngIf="
+                                  attribute?.get('deductiblesForm.percentOf')
+                                    ?.errors &&
+                                  (attribute?.get('deductiblesForm.percentOf')
+                                    ?.dirty ||
+                                    attribute?.get('deductiblesForm.percentOf')
+                                      ?.touched)
+                                "
+                              >
+                                <cb-icon
+                                  iconKey="utility-error-stroke"
+                                  iconColor="error-shade"
+                                  [iconSize]="cbIconSize.REGULAR"
+                                  [addPointerClass]="false"
+                                ></cb-icon>
+                                <span
+                                  class="error-text-container__error-text"
+                                  *ngIf="attribute?.get('deductiblesForm.percentOf')?.errors?.['required']"
+                                  >Value is required</span
+                                >
+                                <span
+                                  class="error-text-container__error-text"
+                                  *ngIf="attribute?.get('deductiblesForm.percentOf')?.errors?.['pattern']"
+                                  >Please enter valid number</span
+                                >
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </p-accordionTab>
+                    </p-accordion>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            class="adult-variant-level__sub-coverages-form-action-button"
+            *ngIf="
+              subCoverageList &&
+              subCoverageList.length > 0 &&
+              formArray.length < subCoverageList.length
+            "
+          >
+            <button
+              cbButton
+              label="Add subcoverage"
+              [disabled]="disableEdit"
+              [leftIcon]="'utility-add'"
+              variant="ghost"
+              [colorTheme]="colorTheme"
+              (click)="addSubCoverage()"
+            ></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="adult-variant-level__footer-buttons">
+        <div class="adult-variant-level__footer-buttons--left">
+          <button
+            cbButton
+            label="Back"
+            [leftIcon]="'utility-arrow-left'"
+            variant="ghost"
+            (click)="previous()"
+          ></button>
+        </div>
+        <div class="adult-variant-level__footer-buttons--right">
+          <button
+            cbButton
+            label="Clear all"
+            variant="ghost"
+            (click)="onClear()"
+            [disabled]="disableEdit"
+          ></button>
+          <button
+            cbButton
+            label="Save & exit"
+            variant="secondary"
+            [colorTheme]="colorTheme"
+            (click)="saveAndExit()"
+            [disabled]="!variantLevelForm.valid || disableEdit"
+          ></button>
+          <button
+            cbButton
+            [label]="disableEdit ? 'Next' : 'Save & next'"
+            variant="primary"
+            [colorTheme]="colorTheme"
+            (click)="saveAndNext()"
+            [disabled]="!variantLevelForm.valid"
+          ></button>
+        </div>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+<!-- Sub coverage variant level delete confirmation modal -->
+<cb-modal
+  [open]="openModal"
+  (closeEvent)="handleModal()"
+  title="Do you want to delete record from sub coverage?"
+  message=""
+  [hideCloseIcon]="false"
+>
+  <div class="adult-variant-level__modal-button-wrapper">
+    <button
+      cbButton
+      label="Cancel"
+      variant="secondary"
+      (click)="handleModal()"
+    ></button>
+    <button
+      cbButton
+      label="Continue"
+      variant="primary"
+      [colorTheme]="cbColorTheme.DEFAULT"
+      (click)="onConfirm()"
+    ></button>
+  </div>
+</cb-modal>
+
+<div class="adult-variant-level__modalr" *ngIf="sidebarVisible">
+  <cb-modal
+    [open]="sidebarVisible"
+    [title]="modalConfig.title"
+    [description]="modalConfig.description"
+    (closeEvent)="sidebarVisible = false"
+    [hideCloseIcon]="false"
+    contentVariant="heavy"
+  >
+    <div class="adult-variant-level__modalr-content">
+      <ng-container
+        *ngTemplateOutlet="modalConfig.contentPlaceholder"
+      ></ng-container>
+    </div>
+    <div class="adult-variant-level__modalr-btn-wrapper">
+      <div>
+        <button
+          cbButton
+          [label]="modalConfig.tertiaryBtnLabel"
+          [disabled]="disable"
+          variant="ghost"
+          (click)="onButtonAction(modalConfig.tertiaryAction)"
+        ></button>
+      </div>
+      <div class="adult-variant-level__modalr-btns-prime">
+        <button
+          cbButton
+          [label]="modalConfig.secondaryBtnLabel"
+          [disabled]="disable"
+          variant="secondary"
+          (click)="onButtonAction(modalConfig.secondaryAction)"
+        ></button>
+        <button
+          cbButton
+          [label]="modalConfig.primaryBtnLabel"
+          [variant]="modalConfig.primaryBtnVariant ?? 'danger'"
+          [leftIcon]="modalConfig.primaryBtnIconKey ?? ''"
+          [colorTheme]="colorTheme"
+          (click)="onButtonAction(modalConfig.primaryAction)"
+          [disabled]="
+            modalConfig.primaryButtonDisableFn
+              ? modalConfig.primaryButtonDisableFn()
+              : false || disable
+          "
+        ></button>
+      </div>
+    </div>
+  </cb-modal>
+</div>
+
+<ng-template #additionalInfoFormRef>
+  <div class="adult-variant-level__modalr-form">
+    <div
+      *ngIf="additionalInfoForm?.formGroup?.errors?.['minGreaterThanMax'] && 
+           (additionalInfoForm?.formGroup?.get('minAmount')?.dirty || additionalInfoForm?.formGroup?.get('minAmount')?.touched)"
+      class="error-message"
+      style="color: red; margin-top: 4px"
+    >
+      Minimum value cannot be greater than Maximum value.
+    </div>
+    <canvas-reactive-form
+      #additionalInfoForm
+      [reactiveFormConfig]="additionalInfoFormFields"
+      [reactiveFormModel]="editDrawerModel"
+      (selectValueChange)="onAdditionalInfoSelectValueChange($event)"
+    ></canvas-reactive-form>
+  </div>
+</ng-template>

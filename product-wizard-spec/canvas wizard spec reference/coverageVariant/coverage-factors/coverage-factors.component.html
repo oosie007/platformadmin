@@ -1,0 +1,143 @@
+<div class="coverage-factors__container">
+  <div class="coverage-factors__title">
+    {{ labels.title }}
+  </div>
+  <div
+    [cbAccordion]="accordion"
+    padding="medium"
+    cueType="caret"
+    cuePosition="left"
+    headerStyle="basic"
+    [indent]="true"
+    colorTheme="default"
+  >
+    <p-accordion
+      #accordion
+      [multiple]="true"
+      class="coverage-factors__accordians"
+    >
+      <p-accordionTab [header]="labels.ageBand" [selected]="true">
+        <form [formGroup]="ageForm">
+          <div
+            class="toggle-button"
+            cbToggle
+            [toggleOnText]="labels.active ?? ''"
+            [toggleOffText]="labels.active ?? ''"
+            [showIcons]="true"
+            [readonly]="false"
+          >
+            <input type="checkbox" formControlName="isActive" />
+          </div>
+          <div formArrayName="rows">
+            <div
+              *ngFor="let row of rows.controls; let i = index"
+              [formGroupName]="i"
+              class="coverage-factors__row"
+            >
+              <div cbInput styleVariant="default" colorTheme="default">
+                <input type="number" formControlName="start" min="1" step="1" />
+              </div>
+              <div>-</div>
+              <div cbInput styleVariant="default" colorTheme="default">
+                <input type="number" formControlName="end" min="1" step="1" />
+              </div>
+              <button
+                cbButton
+                [leftIcon]="'utility-close-circle-stroke'"
+                variant="ghost"
+                (click)="deleteRow(i)"
+                *ngIf="i !== 0"
+                [disabled]="!ageForm.get('isActive')?.value || isReadOnly"
+              ></button>
+              <button
+                cbButton
+                [leftIcon]="'utility-add-circle-stroke'"
+                variant="ghost"
+                (click)="addRow()"
+                [disabled]="!ageForm.get('isActive')?.value || isReadOnly"
+              ></button>
+            </div>
+          </div>
+          <div
+            *ngIf="ageForm.errors?.['ageOverlap'] && ageForm.touched"
+            class="coverage-factors-error-message"
+          >
+            {{ labels.ageError }}
+          </div>
+        </form>
+      </p-accordionTab>
+
+      <p-accordionTab [header]="labels.gender" [selected]="true">
+        <form [formGroup]="genderForm">
+          <div
+            class="toggle-button"
+            cbToggle
+            [toggleOnText]="labels.active ?? ''"
+            [toggleOffText]="labels.active ?? ''"
+            [showIcons]="true"
+            [readonly]="false"
+          >
+            <input type="checkbox" formControlName="isActive" />
+          </div>
+          <div
+            class="coverage-factors__table"
+            style="position: relative"
+            *ngIf="listOptions"
+          >
+            <canvas-table
+              [options]="listOptions"
+              [data]="genderData"
+              [selectedRow]="selectedRow"
+              (checkboxChecked)="checkboxChecked($event)"
+            ></canvas-table>
+            <div
+              *ngIf="!genderForm.get('isActive')?.value || isReadOnly"
+              class="coverage-factors__table-overlay"
+            ></div>
+          </div>
+        </form>
+      </p-accordionTab>
+    </p-accordion>
+  </div>
+
+  <div class="coverage-factors__footer-buttons">
+    <div class="coverage-factors__footer-buttons--left">
+      <button
+        cbButton
+        [label]="labels.back"
+        [leftIcon]="'utility-arrow-left'"
+        variant="ghost"
+        (click)="previous()"
+      ></button>
+    </div>
+    <div class="coverage-factors__footer-buttons--right">
+      <button
+        cbButton
+        [label]="labels.saveAndExit"
+        variant="secondary"
+        [colorTheme]="colorTheme"
+        [disabled]="isReadOnly"
+        (click)="saveAndExit()"
+      ></button>
+      <button
+        cbButton
+        [label]="labels.next"
+        variant="primary"
+        [colorTheme]="colorTheme"
+        (click)="saveAndNext()"
+      ></button>
+    </div>
+  </div>
+</div>
+
+<cb-modal
+  [open]="openConfirmationModal"
+  (closeEvent)="handleConfirmationModal()"
+  [title]="labels.modalTitle"
+  [description]="labels.modalText"
+  [hideCloseIcon]="false"
+  [actions]="modalActions"
+  (primaryEvent)="modalConfirmation()"
+  (secondaryEvent)="handleConfirmationModal()"
+>
+</cb-modal>

@@ -1,0 +1,120 @@
+<p-toast position="top-right" key="tr"></p-toast>
+<div class="rating-factor" style="margin-bottom: 30px;">
+  <div
+    class="rating-factor__title__form-content rating-factor-content-panel"
+  >
+    <div class="rating-factor__title--head">{{ labels.title }}</div>
+    <div
+    cbToggle
+    [toggleOnText]="labels.useRatingBreakdownLabel"
+    [toggleOffText]="labels.useRatingBreakdownLabel"
+    [showIcons]="true"
+    color="default"
+  >
+    <input
+      type="checkbox"
+      id="togglecheck"
+      [ngModel]="isPartnerProvidedPremium"
+      (ngModelChange)="onPremiumToggleChange($event)"
+      [disabled]="fieldsetDisabled"
+    />
+    </div>
+    <div class="">
+      {{labels.tooltipAllocation}}
+     </div>
+  </div>
+</div>
+@if(!isPartnerProvidedPremium) {
+<div class="rating-factor__container">
+  <div class="rating-factor__form-content products-content-panel">
+    <div class="rating-factor__tooltip">
+      <div class="rating-factor__title">Ratings</div>
+      <div class="rating-factor__tooltiptext">
+        <cb-tooltip
+        explanationText="Rating factor is an individual characteristic or variable of an individual, object or entity used to calculate insurance premiums."
+        styleVariant="stroke"
+        [colorTheme]="cbToolTipColorTheme"
+        direction="above-right"
+        >
+        <cb-icon iconKey="utility-tooltip-stroke"></cb-icon>
+        </cb-tooltip>
+      </div>
+    </div>
+    <div class="rating-factor__question-mapping-wrapper">
+      <div cbSelectChoice label="Select rating service" styleVariant="default" placeholder="Select API here"
+        class="rating-factor__accordions-select-api">
+        <select [required]="true" [disabled]="isDisable" (change)="onEndpointSelect($event)">
+          <option *ngFor="let ep of (endpointList | inputUnselect); let j = index" [value]="ep.reId"
+            [selected]="reId === ep.reId">
+            {{ ep.label }} {{ep.version ? '-' : ''}} {{ep.version}}
+          </option>
+        </select>
+      </div>
+      <div class="rating-factor__question-mapping--button">
+        <button cbButton label="Lookup" variant="primary" [colorTheme]="cbColorTheme.DEFAULT" (click)="btnClick()"
+          [disabled]="isDisable"></button>
+      </div>
+    </div>
+
+    <div class="rating-factor__accordions-wrapper">
+      <div *ngFor="let item of ratingInfo; let i = index">
+        <div class="rating-factor__accordions-element">
+          <div cbInput label="Rating service input" styleVariant="default" class="rating-factor__rating-width" helpText="">
+            <input placeholder="{{ item.input || 'Select' }}" type="text" pattern=".*" maxLength="500"
+              [required]="false" [disabled]="true" />
+          </div>
+
+          <div class="rating-factor__rating-width">
+            <div [cbSelectMultiple]="selectMultipleRatingType" label="Rating factor type" class="rating-factor__accordions-select">
+              <p-multiSelect #selectMultipleRatingType [options]="ratingFactorTypes" [disabled]="isDisable"
+                placeholder="Select rating factors" inputId="selectMultipleRatingType" [ngModelOptions]="{standalone: true}"
+                (onChange)="onChangeRatingFactorType($event, i)" [(ngModel)]="ratingInfo[i].types"></p-multiSelect>
+            </div>
+            <div class="cds-flex rating-factor__chips-align">   
+              <div *ngIf="ratingInfo[i].types.length">
+                <p-chips fieldVariant="stroke" [(ngModel)]="ratingInfo[i].types" [ngModelOptions]="{standalone: true}"
+                  [disabled]="isDisable" (ngModelChange)="onChipRatingFactorChange(ratingInfo[i].types, i)">
+                </p-chips>
+                <button class="edit-coverage-variant__chips-clear-all" cbButton label="Clear all selection" [disabled]="isDisable"
+                  variant="primary" [disabled]="isDisable" (click)="clearSelection(ratingInfo[i].types, i, 'ratingType')"></button>
+              </div>
+            </div>
+          </div>
+          <div class="rating-factor__rating-width">
+            <div [cbSelectMultiple]="selectMultipleGlobalRating" label="Rating factor" class="rating-factor__accordions-select">
+              <p-multiSelect #selectMultipleGlobalRating [options]="ratingInfo[i].options" [disabled]="isDisable"
+                 placeholder="{{ ratingInfo[i].ratingsSelected[0] || 'Select' }}" inputId="selectMultipleGlobalRating" [selectAll]="selectAllRatingFactors"
+                 (onSelectAllChange)="onSelectAllRatingFactor($event, i)"
+                [(ngModel)]="ratingInfo[i].ratingsSelected" (onChange)="onRatingFactorChange(i)"
+                [ngModelOptions]="{standalone: true}"></p-multiSelect>
+            </div>
+            <div class="cds-flex rating-factor__chips-align">   
+              <div *ngIf="ratingInfo[i].ratingsSelected.length">
+                <p-chips fieldVariant="stroke" [(ngModel)]="ratingInfo[i].ratingsSelected"
+                  (ngModelChange)="onChipRatingFactorChange(ratingInfo[i].ratingsSelected, i)" [ngModelOptions]="{standalone: true}"
+                  [disabled]="isDisable">
+                </p-chips>
+                <button class="edit-coverage-variant__chips-clear-all" cbButton label="Clear all selection" [disabled]="isDisable"
+                  variant="primary" (click)="clearSelection(ratingInfo[i].ratingsSelected, i, 'ratingSelected')" [disabled]="isDisable"></button>
+              </div>
+            </div>
+          
+          </div>
+         
+        </div>
+       
+      </div>
+    </div>
+  </div>
+</div>
+}
+<div class="rating-factor__footer-buttons products-footer-panel">
+  <div class="rating-factor__footer-buttons--left">
+    <button cbButton label="Back" [leftIcon]="'utility-arrow-left'" variant="ghost" (click)="previous()"></button>
+  </div>
+  <div class="rating-factor__footer-buttons--right">
+    <button cbButton label="Save & exit" variant="secondary" [colorTheme]="colorTheme" (click)="save(true)"
+      [disabled]="isDisable"></button>
+    <button cbButton label="Next" variant="primary" [colorTheme]="colorTheme" (click)="save(false)"></button>
+  </div>
+</div>

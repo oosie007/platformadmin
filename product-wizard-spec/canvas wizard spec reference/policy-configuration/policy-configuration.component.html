@@ -1,0 +1,738 @@
+<div class="policy-configuration__container">
+  <form [formGroup]="policyConfigurationForm">
+    <div class="policy-configuration__title">Policy configuration</div>
+    <div class="policy-configuration__policy-container">
+      <div class="policy-configuration__body-wrapper">
+        <div class="policy-configuration__form-field">
+          <div
+            class="policy-configuration__body-divwidth"
+            cbSelectChoice
+            label="Policy type"
+            placeholder="Select"
+            colorTheme="default"
+          >
+            <select formControlName="policyType">
+              <option
+                *ngFor="let policy of policyType | inputUnselect"
+                [ngValue]="policy.code"
+                [selected]="policy.code === field['policyType'].value"
+              >
+                {{ policy.description }}
+              </option>
+            </select>
+          </div>
+          <div
+            class="policy-configuration__error-message-container"
+            *ngIf="field['policyType'].errors && (field['policyType']?.['dirty'] || field['policyType']?.['touched'])"
+          >
+            <div *ngIf="field['policyType'].errors['required']">
+              <div class="error-text-container">
+                <cb-icon
+                  iconKey="utility-error-stroke"
+                  iconColor="error-shade"
+                  [iconSize]="iconSize"
+                  [addPointerClass]="false"
+                ></cb-icon>
+                <span class="error-text-container__error-text"
+                  >Policy type is required</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="policy-configuration__form-field">
+          <div
+            class="policy-configuration__body-divwidth"
+            cbInput
+            label="Policy prefix"
+            styleVariant="default"
+            colorTheme="default"
+            cbTooltip="A unique 3-digit alphanumeric character value used as policy number prefix for policies issued against this product."
+            tooltipStyleVariant="stroke"
+            tooltipColorTheme="default"
+          >
+            <input
+              placeholder="Enter policy prefix"
+              type="text"
+              formControlName="policyPrefix"
+            />
+          </div>
+          <div
+            class="policy-configuration__error-message-container"
+            *ngIf="field['policyPrefix'].errors && (field['policyPrefix']?.['dirty'] || field['policyPrefix']?.['touched'])"
+          >
+            <div *ngIf="field['policyPrefix'].errors['required']">
+              <div class="error-text-container">
+                <cb-icon
+                  iconKey="utility-error-stroke"
+                  iconColor="error-shade"
+                  [iconSize]="iconSize"
+                  [addPointerClass]="false"
+                ></cb-icon>
+                <span class="error-text-container__error-text"
+                  >Policy prefix is required</span
+                >
+              </div>
+            </div>
+            <div *ngIf="field['policyPrefix'].errors['maxlength']">
+              <div class="error-text-container">
+                <cb-icon
+                  iconKey="utility-error-stroke"
+                  iconColor="error-shade"
+                  [iconSize]="iconSize"
+                  [addPointerClass]="false"
+                ></cb-icon>
+                <span class="error-text-container__error-text"
+                  >Max length is 3</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="policy-configuration__togglebody">
+        <div
+          class="policy-configuration__event-toggle"
+          *ngIf="field['policyType'].value === 'MICROINSURANCE'"
+        >
+          <div
+            cbToggle
+            color="default"
+            toggleOnText="Include coverage variants in events"
+            toggleOffText="Include coverage variants in events"
+            [showIcons]="true"
+          >
+            <input
+              type="checkbox"
+              formControlName="breakdownEventByCoverageVariant"
+              [checked]="field['breakdownEventByCoverageVariant'].value"
+            />
+          </div>
+          <div class="policy-configuration__toggle-text">
+            {{ policyLabels.includeCoverageVariantTooltip }}
+          </div>
+        </div>
+      </div>
+      <div class="policy-configuration__togglebody">
+        <div class="policy-configuration__toggle">
+          <div
+            cbToggle
+            color="default"
+            toggleOnText="Allow multiple policies"
+            toggleOffText="Allow multiple policies"
+            [showIcons]="true"
+          >
+            <input
+              type="checkbox"
+              formControlName="allowMultiplePolicy"
+              [checked]="field['allowMultiplePolicy'].value"
+            />
+          </div>
+          <div class="policy-configuration__toggle-text">
+            Turning on this option would make this question a requirement.
+          </div>
+        </div>
+      </div>
+      <div class="policy-configuration__body">
+        <div class="policy-configuration__form-field cb-input">
+          <div
+            cbInput
+            [label]="policyLabels.quoteSuffixLable"
+            styleVariant="default"
+            colorTheme="default"
+            [cbTooltip]="policyLabels.quoteSuffixTooltipMessage"
+            tooltipStyleVariant="stroke"
+            tooltipColorTheme="default"
+          >
+            <input
+              [placeholder]="policyLabels.quoteSuffixPlaceholderLabel"
+              type="text"
+              formControlName="quoteSuffix"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="policy-configuration__title2">Additional information</div>
+    <div class="policy-configuration__policy-container">
+      <div class="policy-configuration__body-wrapper">
+        <div class="policy-configuration__form-field">
+          <div
+            cbSelectChoice
+            label="Tax charge routine"
+            placeholder="Select"
+            colorTheme="default"
+            class="policy-configuration__body"
+          >
+            <select formControlName="taxCharge">
+              <option
+                *ngFor="let tax of taxCharge | inputUnselect"
+                [ngValue]="tax.code"
+                [selected]="tax.code === field['taxCharge'].value"
+              >
+                {{ tax.description }}
+              </option>
+            </select>
+          </div>
+
+          <div
+            class="policy-configuration__error-message-container"
+            *ngIf="field['taxCharge'].errors && (field['taxCharge']?.['dirty'] || field['taxCharge']?.['touched'])"
+          >
+            <div *ngIf="field['taxCharge'].errors['required']">
+              <div class="error-text-container">
+                <cb-icon
+                  iconKey="utility-error-stroke"
+                  iconColor="error-shade"
+                  [iconSize]="iconSize"
+                  [addPointerClass]="false"
+                >
+                </cb-icon>
+                <span class="error-text-container__error-text"
+                  >Tax charge is required</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="policy-configuration__form-field">
+          <div
+            cbSelectChoice
+            label="Commission routine"
+            placeholder="Select"
+            colorTheme="default"
+            class="policy-configuration__body"
+          >
+            <select formControlName="commissionRoutine">
+              <ng-container
+                *ngFor="let commission of commissionRoutine | inputUnselect"
+              >
+                <ng-container *ngIf="isCommissionCodeValid(commission.code)">
+                  <option
+                    [ngValue]="commission.code"
+                    [selected]="
+                      commission.code === field['commissionRoutine'].value
+                    "
+                    [title]="getCommissionTitle(commission.code)"
+                  >
+                    {{ commission.description }}
+                  </option>
+                </ng-container>
+              </ng-container>
+            </select>
+          </div>
+          <div
+            class="policy-configuration__error-message-container"
+            *ngIf="field['commissionRoutine'].errors && (field['commissionRoutine']?.['dirty'] || field['commissionRoutine']?.['touched'])"
+          >
+            <div *ngIf="field['commissionRoutine'].errors['required']">
+              <div class="error-text-container">
+                <cb-icon
+                  iconKey="utility-error-stroke"
+                  iconColor="error-shade"
+                  [iconSize]="iconSize"
+                  [addPointerClass]="false"
+                >
+                </cb-icon>
+                <span class="error-text-container__error-text"
+                  >Commission routine is required</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="policy-configuration__togglebody">
+        <div class="policy-configuration__addition-toggle">
+          <div
+            cbToggle
+            color="default"
+            toggleOnText="Single premium"
+            toggleOffText="Single premium"
+            [showIcons]="true"
+          >
+            <input
+              type="checkbox"
+              formControlName="singlePremium"
+              [checked]="field['singlePremium'].value"
+            />
+          </div>
+          <div class="policy-configuration__toggle-text">
+            Turning on this option indicates that policies issued are single
+            premium policies that cannot be renewed or extended.
+          </div>
+          <!-- <div class="policy-configuration__toggle-text">Do note that the Expiration Date of the single premium will be
+            located at Registration.
+          </div> -->
+        </div>
+      </div>
+      <div class="policy-configuration__body-wrapper">
+        <div class="policy-configuration__form-field cb-input">
+          <div
+            cbSelectChoice
+            label="Rounding rule configuration"
+            placeholder="Select"
+            colorTheme="default"
+            [cbTooltip]="policyLabels.roundingRuleTooltipMessage"
+            tooltipStyleVariant="stroke"
+            tooltipColorTheme="default"
+          >
+            <select formControlName="roundingRule" (change)="onTermChange()">
+              <option
+                *ngFor="let type of roundingTypes | inputUnselect"
+                [ngValue]="type.code"
+                [selected]="type.code === field['roundingRule'].value"
+              >
+                {{ type.description }}
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="policy-configuration__body-wrapper">
+        <div
+          cbSelectChoice
+          label="On term end"
+          placeholder="Select"
+          colorTheme="default"
+        >
+          <select formControlName="onTermEnd" (change)="onTermChange()">
+            <option
+              *ngFor="let term of termEnd | inputUnselect"
+              [ngValue]="term.code"
+              [selected]="term.code === field['onTermEnd'].value"
+            >
+              {{ term.description }}
+            </option>
+          </select>
+        </div>
+        <div
+          class="policy-configuration__error-message-container"
+          *ngIf="field['onTermEnd'].errors && (field['onTermEnd']?.['dirty'] || field['onTermEnd']?.['touched'])"
+        >
+          <div *ngIf="field['onTermEnd'].errors['required']">
+            <div class="error-text-container">
+              <cb-icon
+                iconKey="utility-error-stroke"
+                iconColor="error-shade"
+                [iconSize]="iconSize"
+                [addPointerClass]="false"
+              >
+              </cb-icon>
+              <span class="error-text-container__error-text"
+                >On term end is required</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="policy-configuration__body-wrapper">
+        <div class="policy-configuration__form-field cb-input">
+          <div
+            cbSelectChoice
+            [label]="
+              isPerpetual ? 'Policy period type' : 'Policy period type *'
+            "
+            placeholder="Select"
+            colorTheme="default"
+          >
+            <select formControlName="policyPeriodType">
+              <option
+                *ngFor="let pol of policyPeriodType | inputUnselect"
+                [ngValue]="pol.code"
+                [selected]="pol.code === field['policyPeriodType'].value"
+              >
+                {{ pol.description }}
+              </option>
+            </select>
+          </div>
+          <div
+            class="policy-configuration__error-message-container"
+            *ngIf="field['policyPeriodType'].errors && (field['policyPeriodType']?.['dirty'] || field['policyPeriodType']?.['touched'])"
+          >
+            <div *ngIf="field['policyPeriodType'].errors['required']">
+              <div class="error-text-container">
+                <cb-icon
+                  iconKey="utility-error-stroke"
+                  iconColor="error-shade"
+                  [iconSize]="iconSize"
+                  [addPointerClass]="false"
+                ></cb-icon>
+                <span class="error-text-container__error-text"
+                  >Policy period type is required</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="policy-configuration__form-field">
+          <div
+            cbInput
+            [label]="
+              isPerpetual ? 'Policy period value' : 'Policy period value * '
+            "
+            styleVariant="default"
+            colorTheme="default"
+          >
+            <input
+              placeholder="Enter value"
+              type="text"
+              formControlName="policyPeriodValue"
+            />
+          </div>
+          <div
+            class="policy-configuration__error-message-container"
+            *ngIf="field['policyPeriodValue'].errors && (field['policyPeriodValue']?.['dirty'] || field['policyPeriodValue']?.['touched'])"
+          >
+            <div *ngIf="field['policyPeriodValue'].errors['required']">
+              <div class="error-text-container">
+                <cb-icon
+                  iconKey="utility-error-stroke"
+                  iconColor="error-shade"
+                  [iconSize]="iconSize"
+                  [addPointerClass]="false"
+                ></cb-icon>
+                <span class="error-text-container__error-text"
+                  >Policy period value is required</span
+                >
+              </div>
+            </div>
+            <div *ngIf="field['policyPeriodValue'].errors['pattern']">
+              <div class="error-text-container">
+                <cb-icon
+                  iconKey="utility-error-stroke"
+                  iconColor="error-shade"
+                  [iconSize]="iconSize"
+                  [addPointerClass]="false"
+                ></cb-icon>
+                <span class="error-text-container__error-text"
+                  >Only numeric values are allowed</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="policy-configuration__body-wrapper">
+        <div class="policy-configuration__form-field cb-input">
+          <div
+            cbSelectChoice
+            label="Cooling period type"
+            placeholder="Select"
+            colorTheme="default"
+            [cbTooltip]="policyLabels.coolingPeriodTooltipMessage"
+            tooltipStyleVariant="stroke"
+            tooltipColorTheme="default"
+          >
+            <select formControlName="coolingPeriodType">
+              <option
+                *ngFor="let col of coolingPeriodType | inputUnselect"
+                [ngValue]="col.code"
+                [selected]="col.code === field['coolingPeriodType'].value"
+              >
+                {{ col.description }}
+              </option>
+            </select>
+          </div>
+        </div>
+        <div class="policy-configuration__form-field">
+          <div
+            cbInput
+            label="Cooling period value"
+            styleVariant="default"
+            colorTheme="default"
+          >
+            <input
+              placeholder="Enter value"
+              type="text"
+              formControlName="coolingPeriodValue"
+            />
+          </div>
+          <div
+            class="policy-configuration__error-message-container"
+            *ngIf="field['coolingPeriodValue'].errors && (field['coolingPeriodValue']?.['dirty'] || field['coolingPeriodValue']?.['touched'])"
+          >
+            <div *ngIf="field['coolingPeriodValue'].errors['pattern']">
+              <div class="error-text-container">
+                <cb-icon
+                  iconKey="utility-error-stroke"
+                  iconColor="error-shade"
+                  [iconSize]="iconSize"
+                  [addPointerClass]="false"
+                ></cb-icon>
+                <span class="error-text-container__error-text"
+                  >Only numeric values are allowed</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="policy-configuration__body-wrapper"
+        [ngClass]="{
+          'policy-configuration__body-wrapper-margin-bottom-zero': !isTerm
+        }"
+      >
+        <!--  For time being we are using hidden, need to rewrite logic to hide if codition false-->
+        <div class="policy-configuration__form-field">
+          <div
+            cbSelectChoice
+            label="Auto renewal type"
+            placeholder="Select"
+            colorTheme="default"
+            [hidden]="!isTerm"
+          >
+            <select formControlName="renewalType" (change)="onRenewalChange()">
+              <option
+                *ngFor="let ren of renewalType | inputUnselect"
+                [ngValue]="ren.code"
+                [selected]="ren?.code === field['renewalType']?.value"
+              >
+                {{ ren.description }}
+              </option>
+            </select>
+          </div>
+        </div>
+        <!--  For time being we are using hidden, need to rewrite logic to hide if codition false-->
+        <div class="policy-configuration__form-field">
+          <div
+            cbSelectChoice
+            label="Policy number assignment on renewal"
+            placeholder="Select"
+            colorTheme="default"
+            [hidden]="!isAutoRenewalType"
+          >
+            <select formControlName="policyNumber">
+              <option
+                *ngFor="let polNumber of policyNumberRenewal | inputUnselect"
+                [ngValue]="polNumber.code"
+                [selected]="polNumber?.code === field['policyNumber']?.value"
+              >
+                {{ polNumber.description }}
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="policy-configuration__title" *ngIf="isRenewalType">
+        {{ labels.renewalMessage }}
+      </div>
+      <div
+        class="policy-configuration__body-wrapper"
+        [ngClass]="{
+          'policy-configuration__body-wrapper-margin-bottom-zero': !(
+            isRenewalType && this.isCurrentCountryNonUS()
+          )
+        }"
+      >
+        <!--  For time being we are using hidden, need to rewrite logic to hide if codition false-->
+        <div
+          class="policy-configuration__form-field"
+          *ngIf="isRenewalType && this.isCurrentCountryNonUS()"
+        >
+          <div
+            cbInput
+            label="Pre-renewal period (days)"
+            styleVariant="default"
+            colorTheme="default"
+          >
+            <input
+              placeholder="Enter pre-renewal period in days"
+              type="number"
+              min="0"
+              formControlName="preRenewalPeriodDays"
+            />
+          </div>
+          <div
+            class="policy-configuration__error-message-container"
+            *ngIf="field['preRenewalPeriodDays']?.errors && (field['preRenewalPeriodDays']?.['dirty'] || field['preRenewalPeriodDays']?.['touched'])"
+          >
+            <div *ngIf="field['preRenewalPeriodDays']?.errors?.['required']">
+              <div class="error-text-container">
+                <cb-icon
+                  iconKey="utility-error-stroke"
+                  iconColor="error-shade"
+                  [iconSize]="iconSize"
+                  [addPointerClass]="false"
+                ></cb-icon>
+                <span class="error-text-container__error-text"
+                  >Pre-renewal period(days) is required</span
+                >
+              </div>
+            </div>
+          </div>
+          <div
+            class="policy-configuration__error-message-container"
+            *ngIf="policyConfigurationForm.errors?.['preRenewalLessThanNotice']"
+          >
+            <div class="error-text-container">
+              <cb-icon
+                iconKey="utility-error-stroke"
+                iconColor="error-shade"
+                [iconSize]="iconSize"
+                [addPointerClass]="false"
+              ></cb-icon>
+              <span class="error-text-container__error-text"
+                >Pre-renewal period cannot be less than renewal notice
+                period</span
+              >
+            </div>
+          </div>
+        </div>
+        <div
+          class="policy-configuration__form-field"
+          *ngIf="isRenewalType && this.isCurrentCountryNonUS()"
+        >
+          <div
+            cbInput
+            label="Renewal notice period (days)"
+            styleVariant="default"
+            colorTheme="default"
+          >
+            <input
+              type="number"
+              placeholder="Enter notice period in days"
+              min="0"
+              formControlName="renewalNoticePeriodDays"
+            />
+          </div>
+          <div
+            class="policy-configuration__error-message-container"
+            *ngIf="field['renewalNoticePeriodDays']?.errors && (field['renewalNoticePeriodDays']?.['dirty'] || field['renewalNoticePeriodDays']?.['touched'])"
+          >
+            <div *ngIf="field['renewalNoticePeriodDays']?.errors?.['required']">
+              <div class="error-text-container">
+                <cb-icon
+                  iconKey="utility-error-stroke"
+                  iconColor="error-shade"
+                  [iconSize]="iconSize"
+                  [addPointerClass]="false"
+                ></cb-icon>
+                <span class="error-text-container__error-text"
+                  >Renewal notice period is required</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="policy-configuration__body-wrapper">
+        <div class="policy-configuration__form-field cb-input">
+          <div
+            cbSelectChoice
+            label="Renewal referral setting *"
+            placeholder="Select"
+            colorTheme="default"
+            [hidden]="!isRenewalType"
+            [cbTooltip]="policyLabels.renewalReferalTooltipMessage"
+            tooltipStyleVariant="stroke"
+            tooltipColorTheme="default"
+          >
+            <select formControlName="renewalReferralSetting">
+              <option
+                *ngFor="let ren of renewalReferralSetting | inputUnselect"
+                [ngValue]="ren.code"
+                [selected]="
+                  ren?.code === field['renewalReferralSetting']?.value
+                "
+              >
+                {{ ren.description }}
+              </option>
+            </select>
+          </div>
+          <div
+            class="policy-configuration__error-message-container"
+            *ngIf="field['renewalReferralSetting']?.errors && (field['renewalReferralSetting']?.['dirty'] || field['renewalReferralSetting']?.['touched'])"
+          >
+            <div *ngIf="field['renewalReferralSetting']?.errors?.['required']">
+              <div class="error-text-container">
+                <cb-icon
+                  iconKey="utility-error-stroke"
+                  iconColor="error-shade"
+                  [iconSize]="iconSize"
+                  [addPointerClass]="false"
+                ></cb-icon>
+                <span class="error-text-container__error-text"
+                  >Renewal referral setting is required</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="policy-configuration__togglebody__partnerrenew">
+          <div class="policy-configuration__addition-toggle" *ngIf="isRenewalType">
+            <div
+              cbToggle
+              color="default"
+              toggleOnText="Partner to renew"
+              toggleOffText="Partner to renew"
+              [showIcons]="true"
+            >
+              <input
+                type="checkbox"
+                formControlName="renewalToggle"
+                [checked]="field['renewalToggle']?.value"
+              />
+            </div>
+            <div class="policy-configuration__toggle-text">
+              {{ policyLabels.partnerRenewToolTipText }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <ng-container *ngIf="isCurrentCountryNonUS()">
+    <div class="policy-configuration__title2">{{ labels.title }}</div>
+    <div *ngIf="options">
+      <canvas-table
+        [data]="minimumPremiumList"
+        [options]="options"
+      ></canvas-table>
+    </div>
+  </ng-container>
+</div>
+
+<div class="footer-buttons">
+  <div class="footer-buttons--left">
+    <button
+      cbButton
+      label="Back"
+      [leftIcon]="'utility-arrow-left'"
+      variant="ghost"
+      (click)="previous()"
+    ></button>
+  </div>
+  <div class="footer-buttons--right">
+    <button
+      cbButton
+      label="Save & exit"
+      variant="secondary"
+      [colorTheme]="colorTheme"
+      (click)="saveAndExit()"
+      [disabled]="isDisable || !policyConfigurationForm.valid"
+    ></button>
+    <button
+      cbButton
+      label="Next"
+      variant="primary"
+      [colorTheme]="colorTheme"
+      (click)="next()"
+      *ngIf="!isDisable"
+      [disabled]="!policyConfigurationForm.valid"
+    ></button>
+    <button
+      cbButton
+      label="Next"
+      variant="primary"
+      [colorTheme]="colorTheme"
+      (click)="submit()"
+      *ngIf="isDisable"
+    ></button>
+  </div>
+</div>

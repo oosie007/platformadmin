@@ -1,0 +1,114 @@
+@import '@chubb/ui-components/styles/cb-table';
+@import '~primeng/resources/primeng.min.css';
+@import '~primeng/resources/themes/saga-blue/theme.css';
+@import '../../../../styles/custom-table';
+
+.link-standard {
+  &__container {
+    @apply cds-p-5 cds-bg-neutral-white;
+
+    .cb-search-input{
+      @apply cds-h-11 cds-bg-gray-100;
+
+      .p-inputwrapper{
+        @apply cds-flex cds-w-full #{!important};
+      }
+      .cb-search-input__wrapper {
+        @apply cds-grid #{!important};
+      }
+     
+    }
+    .banner {
+      @apply cds-pb-8;
+    }
+
+    .cb-button--primary-purple {
+      @apply cds-gap-x-0 cds-mb-1;
+    }
+
+    &.cb-tooltip {
+      @apply cds-inline-block;
+    }
+  }
+
+  &__search-create {
+    @apply cds-flex cds-gap-lg1 cds-pb-2;
+  }
+  &__body {
+    &-wrapper {
+      @apply cds-flex cds-justify-center cds-items-center cds-gap-x-lg1 cds-self-stretch;
+
+      &-tmpbutton {
+        @apply cds-w-max;
+      }
+    }
+  }
+
+  &__title {
+    @apply cds-font-bold cds-font-lato cds-text-mobile-headline-6-medium cds-pb-5;
+
+    &-span {
+      @apply cds-text-sm;
+    }
+
+  }
+
+  &__tooltip {
+    @apply cds-flex;
+  }
+
+  &__icondiv {
+    @apply cds-flex;
+  }
+
+  &__iconimage {
+    @apply cds-p-1;
+  }
+
+  &__divnote {
+    @apply cds-pl-2 cds-font-body-regular-underlined;
+  }
+
+  &__tooltiptext {
+    @apply cds-p-1;
+  }
+
+  &__footer-buttons {
+    @apply cds-flex cds-justify-between cds-items-center cds-pt-12 cds-no-underline;
+
+    &--right {
+      @apply cds-flex;
+
+      .cb-button {
+        @apply cds-mx-2;
+      }
+    }
+
+    &--left {
+      .cb-button {
+        @apply cds-pl-0;
+      }
+    }
+  }
+  &__footer-button {
+    @apply cds-flex cds-justify-between cds-items-center cds-no-underline;
+
+    &--right {
+      @apply cds-flex;
+
+      .cb-button {
+        @apply cds-mx-2;
+      }
+    }
+
+    &--left {
+      .cb-button {
+        @apply cds-pl-0;
+      }
+    }
+  }
+}
+
+.cdk-overlay-container {
+  z-index: 1102;
+}

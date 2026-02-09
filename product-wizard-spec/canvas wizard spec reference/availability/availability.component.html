@@ -1,0 +1,104 @@
+<p-toast position="top-right" key="tr"></p-toast>
+<div class="availability__container">
+  <div class="availability__container--title">
+    <div class="availability__tooltip">
+      <div class="availability__title">Availability</div>
+      <div class="availability__tooltiptext">
+        <cb-tooltip
+          explanationText="Define product availability for countries with corresponding currency as specified on the product details screen"
+          styleVariant="stroke"
+          [colorTheme]="cbToolTipColorTheme"
+          direction="above-right"
+        >
+          <cb-icon iconKey="utility-tooltip-stroke"></cb-icon>
+        </cb-tooltip>
+      </div>
+    </div>
+    <button
+      cbButton
+      label="Create"
+      variant="primary"
+      leftIcon="utility-document-edit-stroke"
+      [colorTheme]="colorTheme"
+      [disabled]="true"
+      (click)="createAvailability()"
+    ></button>
+  </div>
+  <div class="availability__container--search" cbSearchInput>
+    <div class="cb-search-input__wrapper">
+      <span class="p-inputgroup-addon">
+        <cb-icon
+          iconKey="utility-search"
+          [iconColor]="'neutral-400'"
+        ></cb-icon>
+      </span>
+      <p-autoComplete
+        [showClear]="true"
+        field="name"
+        placeholder="Search Availability"
+      >
+      </p-autoComplete>
+    </div>
+  </div>
+
+  <canvas-table
+    [data]="availabilityList"
+    [options]="options"
+    (selectionChanged)="onSelectedRow($event)"
+  ></canvas-table>
+
+  <ng-container *ngIf="_showModal">
+    <cb-modal
+      [open]="open"
+      (closeEvent)="closeModal()"
+      title="Do you want to delete the availability"
+      message=" "
+      [hideCloseIcon]="false"
+      >'
+      <div class="availability__footer-button--right">
+        <button
+          cbButton
+          label="Cancel"
+          variant="secondary"
+          (click)="closeModal()"
+        ></button>
+        <button
+          cbButton
+          label="Yes"
+          variant="primary"
+          [colorTheme]="colorTheme"
+          (click)="Delete()"
+        ></button>
+      </div>
+    </cb-modal>
+  </ng-container>
+
+  <div class="availability__footer-buttons">
+    <div class="availability__footer-buttons--left">
+      <button
+        cbButton
+        label="Back"
+        [leftIcon]="'utility-arrow-left'"
+        variant="ghost"
+        (click)="previous()"
+      ></button>
+    </div>
+    <div class="availability__footer-buttons--right">
+      <button
+        cbButton
+        label="Save & exit"
+        variant="secondary"
+        *ngIf="!canSaveExit"
+        [colorTheme]="colorTheme"
+        (click)="saveAndExit()"
+      ></button>
+      <button
+        cbButton
+        label="Next"
+        variant="primary"
+        [colorTheme]="colorTheme"
+        (click)="next()"
+      ></button>
+    </div>
+  </div>
+</div>

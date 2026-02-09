@@ -1,0 +1,497 @@
+<div class="product-overview__container">
+  <div class="product-overview__container--head">
+    <div class="product-overview__title">
+      {{ constants.labels['basicInfo'] }}
+    </div>
+    <div class="product-overview__container--button">
+      <div
+        cbSelectChoice
+        [label]="labels.productVersionLabel"
+        placeholder="Select"
+        tooltipStyleVariant="stroke"
+        tooltipColorTheme="default"
+        class="product-overview__container--head__w-auto"
+      >
+        <select (change)="onVersionChange()" [(ngModel)]="versioningCtrl">
+          <option
+            *ngFor="let version of availableVersions"
+            [value]="version.version"
+            [selected]="version.version === versioningCtrl"
+          >
+            {{ version.version }}
+          </option>
+        </select>
+      </div>
+      <button
+        cbButton
+        *ngIf="!showDiscardButton"
+        [colorTheme]="createVersionTheme"
+        [disabled]="!versioning"
+        leftIcon="utility-add"
+        [label]="labels.createNewVersionButtonLabel"
+        (click)="createProductVersion()"
+        [pTooltip]="versioning ? '' : tooltipTextForNewVers"
+        [tooltipPosition]="'top'"
+      ></button>
+      <button
+        cbButton
+        *ngIf="showDiscardButton"
+        [colorTheme]="createVersionTheme"
+        [label]="labels.discardNewVersionButtonLabel"
+        (click)="discardAndExit()"
+      ></button>
+    </div>
+  </div>
+  <div class="product-overview__form-content products-content-panel">
+    <form [formGroup]="product">
+      <div class="product-overview__body-wrapper">
+        <div class="product-overview__form-field cb-input">
+          <div cbInput label="Product name">
+            <input
+              placeholder="Enter the product name"
+              type="text"
+              formControlName="productName"
+              colorTheme="default"
+            />
+          </div>
+          <div
+            class="product-overview__error-message-container"
+            *ngIf="field['productName'].errors && (field['productName']?.['dirty'] || field['productName']?.['touched'])"
+          >
+            <div *ngIf="field['productName'].errors['required']">
+              <div class="error-text-container">
+                <cb-icon
+                  iconKey="utility-error-stroke"
+                  iconColor="error-shade"
+                  [iconSize]="iconSize"
+                  [addPointerClass]="false"
+                ></cb-icon>
+                <span class="error-text-container__error-text"
+                  >Product name is required</span
+                >
+              </div>
+            </div>
+            <div *ngIf="field['productName'].errors['maxlength']">
+              <div class="error-text-container">
+                <cb-icon
+                  iconKey="utility-error-stroke"
+                  iconColor="error-shade"
+                  [iconSize]="iconSize"
+                  [addPointerClass]="false"
+                ></cb-icon>
+                <span class="error-text-container__error-text"
+                  >Max length is 500</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="product-overview__form-field cb-input">
+          <div
+            cbInput
+            label="Product ID"
+            cbTooltip="A unique 10-digit number that helps identify the product. It cannot be a duplicate of an existing product ID."
+            tooltipStyleVariant="stroke"
+            tooltipColorTheme="default"
+          >
+            <input
+              placeholder="Enter the product ID"
+              type="text"
+              formControlName="productId"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="product-overview__body-wrapper">
+        <div class="product-overview__form-field cb-input">
+          <div cbInput label="Marketing name">
+            <input
+              placeholder="Enter the marketing name"
+              type="text"
+              formControlName="marketingName"
+              colorTheme="default"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="product-overview__body-wrapper">
+        <div class="product-overview__form-field cb-input">
+          <div
+            cbTextArea
+            class="cds-col-span-2"
+            label="Product description"
+            sizeVariant="medium"
+          >
+            <textarea
+              placeholder="Enter the product description"
+              formControlName="description"
+            ></textarea>
+          </div>
+          <div
+            class="product-overview__error-message-container"
+            *ngIf="field['description'].errors && (field['description']?.['dirty'] || field['description']?.['touched'])"
+          >
+            <div *ngIf="field['description'].errors['maxlength']">
+              <div class="error-text-container">
+                <cb-icon
+                  iconKey="utility-error-stroke"
+                  iconColor="error-shade"
+                  [iconSize]="iconSize"
+                  [addPointerClass]="false"
+                ></cb-icon>
+                <span class="error-text-container__error-text"
+                  >Max length is 2000</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="product-overview__body-wrapper" formGroupName="dateRange">
+        <div class="product-overview__form-field cb-input">
+          <div cbDateInput label="Effective Date *" [autoOpen]="true">
+            <input
+              cbDatepicker
+              type="date"
+              [min]="effectiveDate"
+              formControlName="effectiveDate"
+            />
+          </div>
+
+          <div
+            class="product-overview__error-message-container"
+            *ngIf="field['dateRange']?.errors || (effectiveDateValidation?.errors && (effectiveDateValidation?.['dirty'] || effectiveDateValidation?.['touched']))"
+          >
+            <div *ngIf="field['dateRange']?.errors?.['effectiveDateInvalid']">
+              <div class="error-text-container">
+                <cb-icon
+                  iconKey="utility-error-stroke"
+                  iconColor="error-shade"
+                  [iconSize]="iconSize"
+                  [addPointerClass]="false"
+                ></cb-icon>
+                <span class="error-text-container__error-text"
+                  >Please enter / select valid date.</span
+                >
+              </div>
+            </div>
+            <div *ngIf="field['dateRange']?.errors?.['isEffectiveDatePast']">
+              <div class="error-text-container">
+                <cb-icon
+                  iconKey="utility-error-stroke"
+                  iconColor="error-shade"
+                  [iconSize]="iconSize"
+                  [addPointerClass]="false"
+                ></cb-icon>
+                <span class="error-text-container__error-text"
+                  >Effective Date shouldn't be past date.</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="product-overview__form-field cb-input">
+          <div cbDateInput label="Expiry date" [autoOpen]="true">
+            <input
+              cbDatepicker
+              type="date"
+              [min]="expiryDate"
+              formControlName="expiryDate"
+            />
+          </div>
+          <div
+            class="product-overview__error-message-container"
+            *ngIf="field['dateRange']?.errors || (expiryDateValidation?.errors && (expiryDateValidation?.['dirty'] || expiryDateValidation?.['touched']))"
+          >
+            <div *ngIf="field['dateRange']?.errors?.['expiryDateInvalid']">
+              <div class="error-text-container">
+                <cb-icon
+                  iconKey="utility-error-stroke"
+                  iconColor="error-shade"
+                  [iconSize]="iconSize"
+                  [addPointerClass]="false"
+                ></cb-icon>
+                <span class="error-text-container__error-text"
+                  >Please enter / select valid date.</span
+                >
+              </div>
+            </div>
+            <div *ngIf="field['dateRange']?.errors?.['dateRangeInvalid']">
+              <div class="error-text-container">
+                <cb-icon
+                  iconKey="utility-error-stroke"
+                  iconColor="error-shade"
+                  [iconSize]="iconSize"
+                  [addPointerClass]="false"
+                ></cb-icon>
+                <span class="error-text-container__error-text"
+                  >Expiry date should be greater than Effective date.</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="product-overview__body-wrapper">
+        <div class="product-overview__form-field cb-input">
+          <div
+            cbSelectChoice
+            label="Status"
+            placeholder="Select"
+            [cbTooltip]="
+              'Delete: The product has been removed.
+          Design: The product is still being worked on. 
+          Final: The product has been finalized.
+          Withdrawn: The product is no longer available.'
+            "
+            tooltipStyleVariant="stroke"
+            tooltipColorTheme="default"
+          >
+            <select formControlName="status" (change)="onStatusChange()">
+              <option
+                *ngFor="let s of statusData | inputUnselect"
+                [value]="s.code"
+                [selected]="s.code === field['status'].value"
+              >
+                {{ s.description }}
+              </option>
+            </select>
+          </div>
+          <div
+            class="product-overview__error-message-container"
+            *ngIf="field['status'].errors && (field['status']?.['dirty'] || field['status']?.['touched'])"
+          >
+            <div *ngIf="field['status'].errors['required']">
+              <div class="error-text-container">
+                <cb-icon
+                  iconKey="utility-error-stroke"
+                  iconColor="error-shade"
+                  [iconSize]="iconSize"
+                  [addPointerClass]="false"
+                ></cb-icon>
+                <span class="error-text-container__error-text"
+                  >Status is required</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+        <div cbInput label="Product version">
+          <input
+            placeholder="Enter the product version"
+            formControlName="productVersionId"
+          />
+        </div>
+        <div
+          class="product-overview__error-message-container"
+          *ngIf="field['productVersionId'].errors && (field['productVersionId']?.['dirty'] || field['productVersionId']?.['touched'])"
+        >
+          <div *ngIf="field['productVersionId'].errors['pattern']">
+            <div class="error-text-container">
+              <cb-icon
+                iconKey="utility-error-stroke"
+                iconColor="error-shade"
+                [iconSize]="iconSize"
+                [addPointerClass]="false"
+              ></cb-icon>
+              <span class="error-text-container__error-text"
+                >Invalid Product VersionId (eg: 1.0,2.0,etc..)</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="product-overview__country">
+        <div class="product-overview__form-field cb-input">
+          <div cbSelectChoice label="Country " placeholder="Select">
+            <select formControlName="country">
+              <option
+                *ngFor="let c of countryList | inputUnselect"
+                [value]="c.code"
+                [selected]="c.code === field['country'].value"
+              >
+                {{ c.description }}
+              </option>
+            </select>
+          </div>
+          <div
+            class="product-overview__error-message-container"
+            *ngIf="field['country'].errors && (field['country']?.['dirty'] || field['country']?.['touched'])"
+          >
+            <div *ngIf="field['country'].errors['required']">
+              <div class="error-text-container">
+                <cb-icon
+                  iconKey="utility-error-stroke"
+                  iconColor="error-shade"
+                  [iconSize]="iconSize"
+                  [addPointerClass]="false"
+                ></cb-icon>
+                <span class="error-text-container__error-text"
+                  >Country is required</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="product-overview__currency">
+        <div class="product-overview__toggle">
+          <div
+            cbToggle
+            toggleOnText="Define limits and premium currency"
+            toggleOffText="Define limits and premium currency"
+            [showIcons]="true"
+            color="default"
+          >
+            <input
+              type="checkbox"
+              id="togglecheck"
+              (change)="
+                toggleLimitsCurrency(
+                  field['limitsCurrency'] && field['limitsCurrency'].value
+                )
+              "
+              [checked]="isLimitsCurrencyEnable"
+              [disabled]="isDisable"
+            />
+          </div>
+          <div class="product-overview__currency-text">
+            Turn on this option to manually input different currencies for
+            premiums and limits. This is typically used for global products
+            collected in a specific currency like USD.
+          </div>
+        </div>
+
+        <div class="product-overview__currency-wrapper">
+          <div
+            class="product-overview__form-field cb-input product-overview__currency-filed"
+          >
+            <div cbSelectChoice label="Premium currency" placeholder="Select">
+              <select formControlName="premiumCurrency">
+                <option
+                  *ngFor="let cur of currency | inputUnselect"
+                  [ngValue]="cur.code"
+                  [selected]="cur.code === field['premiumCurrency'].value"
+                >
+                  {{ cur.description }}
+                </option>
+              </select>
+            </div>
+            <div
+              class="product-overview__error-message-container"
+              *ngIf="field['premiumCurrency'].errors && (field['premiumCurrency']?.['dirty'] || field['premiumCurrency']?.['touched'])"
+            >
+              <div *ngIf="field['premiumCurrency'].errors['required']">
+                <div class="error-text-container">
+                  <cb-icon
+                    iconKey="utility-error-stroke"
+                    iconColor="error-shade"
+                    [iconSize]="iconSize"
+                    [addPointerClass]="false"
+                  ></cb-icon>
+                  <span class="error-text-container__error-text"
+                    >Premium currency is required</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            class="product-overview__form-field cb-input product-overview__currency-filed"
+            *ngIf="isLimitsCurrencyEnable"
+          >
+            <div cbSelectChoice label="Limits currency" placeholder="Select">
+              <select
+                formControlName="limitsCurrency"
+                (chage)="updateLimitsCurrency()"
+              >
+                <option
+                  *ngFor="let cur of currency | inputUnselect"
+                  [ngValue]="cur.code"
+                  [selected]="cur.code === field['limitsCurrency'].value"
+                >
+                  {{ cur.description }}
+                </option>
+              </select>
+            </div>
+            <div
+              class="product-overview__error-message-container"
+              *ngIf="field['limitsCurrency'].errors && (field['limitsCurrency']?.['dirty'] || field['limitsCurrency']?.['touched'])"
+            >
+              <div *ngIf="field['limitsCurrency'].errors['required']">
+                <div class="error-text-container">
+                  <cb-icon
+                    iconKey="utility-error-stroke"
+                    iconColor="error-shade"
+                    [iconSize]="iconSize"
+                    [addPointerClass]="false"
+                  ></cb-icon>
+                  <span class="error-text-container__error-text"
+                    >Limits currency is required</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="product-overview__discard-modal">
+    <cb-modal
+      [open]="sidebarVisible"
+      (closeEvent)="closeModal()"
+      [title]="labels.discardModalTitle"
+      [description]="labels.discardModalDescription"
+    >
+      <div class="product-overview__footer-button--right">
+        <button
+          cbButton
+          [label]="labels.discardModalCancelButtonLabel"
+          variant="secondary"
+          (click)="closeModal()"
+        ></button>
+        <button
+          cbButton
+          [label]="labels.discardModalSaveButtonLabel"
+          [colorTheme]="'default'"
+          (click)="onDiscardVersion()"
+        ></button>
+      </div>
+    </cb-modal>
+  </div>
+</div>
+
+<div class="product-overview__footer-buttons products-footer-panel">
+  <div class="product-overview__footer-buttons--left">
+    <button
+      cbButton
+      label="Back"
+      [leftIcon]="'utility-arrow-left'"
+      variant="ghost"
+      (click)="previous()"
+    ></button>
+  </div>
+  <div class="product-overview__footer-buttons--right">
+    <button
+      cbButton
+      label="Save & exit"
+      variant="secondary"
+      [colorTheme]="colorTheme"
+      (click)="saveAndExit()"
+      [disabled]="!product.valid || canSaveExit"
+    ></button>
+    <button
+      cbButton
+      label="Next"
+      variant="primary"
+      [colorTheme]="colorTheme"
+      (click)="next()"
+      [disabled]="!product.valid"
+    ></button>
+  </div>
+</div>
