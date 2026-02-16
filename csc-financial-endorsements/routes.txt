@@ -1,0 +1,22 @@
+# CSC Financial Endorsements – Routes
+
+Base app: customer-service. Base path typically /customer-service (or similar).
+
+## Routes
+
+1. :region/policy/:id
+   - Component/Page: Product details (policy view/edit).
+   - Purpose: User views policy and makes changes (insureds, objects, coverages, etc.). Changes are accumulated in endorsement state. "Review Changes" navigates to summary.
+
+2. :region/policy/:id/summary
+   - Component/Page: Summary (Review Changes).
+   - Purpose: Shows endorsement preview (from API isPreview=true), list of changes, and the form (endorsement reason, correspondence, notes). On Save, calls API with isPreview=false and form values, then navigates back on success.
+
+## Example URLs
+
+- /customer-service/us/policy/XBUCHCA00017371
+- /customer-service/us/policy/XBUCHCA00017371/summary
+
+## Guards
+
+In Canvas, both routes use expiryGuard (canActivate). Replicate or skip in the new project as needed.

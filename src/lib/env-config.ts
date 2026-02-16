@@ -109,6 +109,12 @@ export interface EnvUrls {
   documentApiBaseUrl: string | null;
   /** URL – catalyst product (digital.system.catalyst-product), optional */
   catalystProductUrl: string | null;
+  /**
+   * Optional base URL for the Canvas endorsement API.
+   * If set, PATCH /canvas/api/catalyst-policy/endorsements is called against this base (e.g. gateway origin or full path).
+   * If not set, the origin of apiBaseUrl is used.
+   */
+  endorsementApiBaseUrl: string | null;
 }
 
 /**
@@ -129,6 +135,10 @@ export function getEnvUrls(envKey: EnvKey): EnvUrls {
         process.env.UAT_EMEA_CATALYST_PRODUCT_URL ??
         process.env.UAT_CATALYST_PRODUCT_URL_UAT ??
         null,
+      endorsementApiBaseUrl:
+        process.env.UAT_EMEA_ENDORSEMENT_API_BASE_URL ??
+        process.env.UAT_ENDORSEMENT_API_BASE_URL ??
+        null,
     };
   }
   // sit: prefer SIT_EMEA_*, then legacy UAT_* for backward compatibility
@@ -144,6 +154,10 @@ export function getEnvUrls(envKey: EnvKey): EnvUrls {
     catalystProductUrl:
       process.env.SIT_EMEA_CATALYST_PRODUCT_URL ??
       process.env.UAT_CATALYST_PRODUCT_URL ??
+      null,
+    endorsementApiBaseUrl:
+      process.env.SIT_EMEA_ENDORSEMENT_API_BASE_URL ??
+      process.env.SIT_ENDORSEMENT_API_BASE_URL ??
       null,
   };
 }

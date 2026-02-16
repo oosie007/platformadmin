@@ -16,6 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 import { type Policy } from "@/lib/mock-data";
 import { logAudit } from "@/lib/audit-client";
 
@@ -173,7 +174,10 @@ export default function PoliciesPage() {
           const body = await res.json().catch(() => ({})) as { error?: string; envKey?: string; debug?: Record<string, unknown> };
           setErrorDebug(body.debug ?? null);
           const envNote = body.envKey ? ` [env: ${body.envKey}]` : "";
-          throw new Error((body.error || `Policy search failed with status ${res.status}`) + envNote);
+          setError((body.error || `Policy search failed with status ${res.status}`) + envNote);
+          setLivePolicies(null);
+          setLoading(false);
+          return;
         }
         const data = await res.json();
         searchResponse = data;
@@ -199,7 +203,10 @@ export default function PoliciesPage() {
             const body = await res.json().catch(() => ({})) as { error?: string; envKey?: string; debug?: Record<string, unknown> };
             setErrorDebug(body.debug ?? null);
             const envNote = body.envKey ? ` [env: ${body.envKey}]` : "";
-            throw new Error((body.error || `Policy search failed with status ${res.status}`) + envNote);
+            setError((body.error || `Policy search failed with status ${res.status}`) + envNote);
+            setLivePolicies(null);
+            setLoading(false);
+            return;
           }
           const data = await res.json();
           searchResponse = data;
@@ -213,7 +220,10 @@ export default function PoliciesPage() {
             const body = await res.json().catch(() => ({})) as { error?: string; envKey?: string; debug?: Record<string, unknown> };
             setErrorDebug(body.debug ?? null);
             const envNote = body.envKey ? ` [env: ${body.envKey}]` : "";
-            throw new Error((body.error || `Policy search failed with status ${res.status}`) + envNote);
+            setError((body.error || `Policy search failed with status ${res.status}`) + envNote);
+            setLivePolicies(null);
+            setLoading(false);
+            return;
           }
           const data = await res.json();
           searchResponse = data;
@@ -310,9 +320,14 @@ export default function PoliciesPage() {
   return (
     <div className="p-6 md:p-8">
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-          Policies
-        </h1>
+        <div className="flex flex-wrap items-center gap-2">
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+            Policies
+          </h1>
+          <Badge variant="outline" className="text-muted-foreground font-normal">
+            Requires .env.local for search
+          </Badge>
+        </div>
         <p className="mt-1 text-muted-foreground">
           Search System 6 policies by policy number, customer, or effective date.
         </p>
@@ -439,9 +454,13 @@ export default function PoliciesPage() {
                     if (!res.ok) {
                       const body = await res.json().catch(() => ({})) as { error?: string; envKey?: string };
                       const envNote = body.envKey ? ` [env: ${body.envKey}]` : "";
-                      throw new Error(
-                        (body.error || `Failed to load policy details (status ${res.status}).`) + envNote
-                      );
+                      setDetailsErrorByPolicyId((prev) => ({
+                        ...prev,
+                        [policy.id]:
+                          (body.error || `Failed to load policy details (status ${res.status}).`) + envNote,
+                      }));
+                      setDetailsLoadingId(null);
+                      return;
                     }
                     const detailJson = await res.json();
                     logAudit({

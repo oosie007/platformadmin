@@ -3,7 +3,7 @@
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, PauseCircle, Pencil, PlayCircle, RotateCcw, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -812,12 +812,60 @@ export default function PolicyDetailPage() {
 
   return (
     <div className="p-6 md:p-8">
-      <Button variant="ghost" size="sm" asChild className="mb-6">
-        <Link href="/policies">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to policies
-        </Link>
-      </Button>
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <Button variant="ghost" size="sm" asChild>
+          <Link href="/policies">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to policies
+          </Link>
+        </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button size="sm" asChild>
+            <Link href={`/policies/${encodeURIComponent(policyNumber)}/endorse`}>
+              <Pencil className="mr-2 h-4 w-4" />
+              Update
+            </Link>
+          </Button>
+          {(() => {
+            const statusLower = (bi.status ?? "").toString().toLowerCase();
+            const isSuspended = statusLower.includes("susp");
+            return isSuspended ? (
+              <Button size="sm" variant="outline" asChild>
+                <Link href={`/policies/${encodeURIComponent(policyNumber)}/unsuspend`}>
+                  <PlayCircle className="mr-2 h-4 w-4" />
+                  Unsuspend
+                </Link>
+              </Button>
+            ) : (
+              <Button size="sm" variant="outline" asChild>
+                <Link href={`/policies/${encodeURIComponent(policyNumber)}/suspend`}>
+                  <PauseCircle className="mr-2 h-4 w-4" />
+                  Suspend
+                </Link>
+              </Button>
+            );
+          })()}
+          {(() => {
+            const statusLower = (bi.status ?? "").toString().toLowerCase();
+            const isCancelled = statusLower.includes("cancel");
+            return isCancelled ? (
+              <Button size="sm" variant="outline" asChild>
+                <Link href={`/policies/${encodeURIComponent(policyNumber)}/reinstate`}>
+                  <RotateCcw className="mr-2 h-4 w-4" />
+                  Reinstate
+                </Link>
+              </Button>
+            ) : (
+              <Button size="sm" variant="outline" asChild>
+                <Link href={`/policies/${encodeURIComponent(policyNumber)}/cancel`}>
+                  <XCircle className="mr-2 h-4 w-4" />
+                  Cancel
+                </Link>
+              </Button>
+            );
+          })()}
+        </div>
+      </div>
 
       <div className="mb-8">
         <h1 className="text-2xl font-semibold tracking-tight text-foreground">

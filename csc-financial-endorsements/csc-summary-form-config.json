@@ -1,0 +1,29 @@
+[
+  {
+    "control": "endorseReason",
+    "label": "Endorsement reason",
+    "type": "dropdown",
+    "required": true,
+    "disabled": false,
+    "placeholder": "Select the reason",
+    "errorMessage": "Reason is Required."
+  },
+  {
+    "control": "correspondence",
+    "label": "Correspondence",
+    "type": "dropdown",
+    "required": true,
+    "disabled": false,
+    "placeholder": "Select the reason",
+    "errorMessage": "Correspondence is Required.",
+    "tooltip": "DEFAULT - Triggers matching fulfilments rules as configured.\n\nSUPPRESS ALL CORRESPONDENCE – Overrides rules; no documents or fulfillment generated.\n\nFORCE PRINT ONLY – Triggers rules but switches channel to \"print\"; adding documents to the print queue without emailing the customer."
+  },
+  {
+    "control": "notes",
+    "label": "Notes",
+    "type": "text",
+    "required": false,
+    "disabled": false,
+    "placeholder": "Write a note"
+  }
+]

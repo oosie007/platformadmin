@@ -15,6 +15,7 @@ import {
   PanelLeftClose,
   PanelLeft,
   X,
+  Construction,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -41,7 +42,7 @@ import { logAudit } from "@/lib/audit-client";
 
 const nav = [
   { label: "Dashboard", href: "/", icon: LayoutDashboard },
-  { label: "Products", href: "/products", icon: Package },
+  { label: "Products", href: "/products", icon: Package, underConstruction: true },
   { label: "Policies", href: "/policies", icon: FileText },
   { label: "Customers", href: "/customers", icon: Users },
 ];
@@ -204,13 +205,20 @@ function SidebarContent({ collapsed, onNavClick, headerExtra, sidebarToggle }: S
                 "font-normal",
                 collapsed ? "h-10 w-10 justify-center p-0" : "justify-start",
                 isActive && "bg-muted text-foreground",
-                !collapsed && isSubItem && "ml-6"
+                !collapsed && isSubItem ? "ml-6" : undefined
               )}
               asChild
             >
-              <Link href={item.href} onClick={onNavClick}>
-                <item.icon className={cn("h-4 w-4", !collapsed && "mr-2")} />
-                {!collapsed && item.label}
+              <Link href={item.href} onClick={onNavClick} className="flex items-center min-w-0">
+                <item.icon className={cn("h-4 w-4 shrink-0", !collapsed && "mr-2")} />
+                {!collapsed && (
+                  <>
+                    <span className="truncate">{item.label}</span>
+                    {"underConstruction" in item && item.underConstruction && (
+                      <Construction className="ml-1.5 h-3.5 w-3.5 shrink-0 text-amber-500" aria-label="Under construction" title="Under construction" />
+                    )}
+                  </>
+                )}
               </Link>
             </Button>
           );
