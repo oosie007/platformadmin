@@ -17,8 +17,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { type Policy } from "@/lib/mock-data";
 import { logAudit } from "@/lib/audit-client";
+import type { PolicySearchRequestBody } from "@/app/api/policies/search/route";
 
 const POLICIES_LIST_STORAGE_KEY = "policies-list-state";
 
@@ -110,7 +116,12 @@ function mapRawToPolicy(raw: unknown, index: number): Policy {
   const fullName = `${firstName} ${lastName}`.trim();
   const policyNumber = String(basicInfo.policyNumber ?? r.policyNumber ?? "");
   const dateEffective = String(
-    basicInfo.effectiveDate ?? basicInfo.effective ?? r.dateEffective ?? r.effectiveDate ?? ""
+    basicInfo.effectiveDate ??
+    basicInfo.effective ??
+    basicInfo.applicationDate ??
+    r.dateEffective ??
+    r.effectiveDate ??
+    ""
   );
   const customerName =
     String(r.customerName ?? "").trim() ||
@@ -155,6 +166,23 @@ export default function PoliciesPage() {
   const [detailsErrorByPolicyId, setDetailsErrorByPolicyId] = useState<Record<string, string>>({});
   const [hasRestoredFromStorage, setHasRestoredFromStorage] = useState(false);
   const [nameOnlyHint, setNameOnlyHint] = useState<string | null>(null);
+  const [advancedOpen, setAdvancedOpen] = useState(false);
+  const [advanced, setAdvanced] = useState<PolicySearchRequestBody>({
+    searchvalue: "",
+    language: "en",
+    person: {
+      dateOfBirth: "",
+      firstName: "",
+      lastName: "",
+      middleName: "",
+      gender: "",
+      nationality: "",
+      personalId: "",
+      personalIdType: "",
+      phoneNumber: "",
+      cellPhone: "",
+    },
+  });
   const hasRunInitialUrlSearch = useRef(false);
 
   const runPolicySearch = useCallback(async (qValue: string, dateValue: string) => {
@@ -261,6 +289,74 @@ export default function PoliciesPage() {
     }
   }, []);
 
+  const runAdvancedSearch = useCallback(async () => {
+    const body: PolicySearchRequestBody = {
+      ...advanced,
+      language: advanced.language?.trim() || "en",
+      searchvalue: advanced.searchvalue?.trim() ?? "",
+      searchType: "ByDemography",
+      resultType: "Detailed",
+      person: {
+        dateOfBirth: advanced.person?.dateOfBirth?.trim() ?? "",
+        firstName: advanced.person?.firstName?.trim() ?? "",
+        lastName: advanced.person?.lastName?.trim() ?? "",
+        middleName: advanced.person?.middleName?.trim() ?? "",
+        gender: advanced.person?.gender?.trim() ?? "",
+        nationality: advanced.person?.nationality?.trim() ?? "",
+        personalId: advanced.person?.personalId?.trim() ?? "",
+        personalIdType: advanced.person?.personalIdType?.trim() ?? "",
+        phoneNumber: advanced.person?.phoneNumber?.trim() ?? "",
+        cellPhone: advanced.person?.cellPhone?.trim() ?? "",
+      },
+    };
+    const hasAny =
+      (body.person?.firstName ?? "").length > 0 ||
+      (body.person?.lastName ?? "").length > 0 ||
+      (body.searchvalue ?? "").length > 0 ||
+      (body.person?.personalId ?? "").length > 0 ||
+      (body.person?.phoneNumber ?? "").length > 0 ||
+      (body.person?.cellPhone ?? "").length > 0;
+    if (!hasAny) {
+      setError("Enter at least one person field (e.g. first name, last name) or search value.");
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    setErrorDebug(null);
+    setNameOnlyHint(null);
+    try {
+      const res = await fetch("/api/policies/search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({})) as { error?: string; envKey?: string; debug?: Record<string, unknown> };
+        setErrorDebug(data.debug ?? null);
+        setError((data.error || `Search failed: ${res.status}`) + (data.envKey ? ` [env: ${data.envKey}]` : ""));
+        setLivePolicies(null);
+        setLoading(false);
+        return;
+      }
+      const data = await res.json();
+      const rawPolicies = extractRawPolicies(data);
+      const mapped = rawPolicies.map((raw: unknown, index: number) => mapRawToPolicy(raw, index));
+      setError(null);
+      setLivePolicies(mapped);
+      setEffectiveDate("");
+      setQuery("");
+      savePoliciesListState({ effectiveDate: "", query: "advanced", policies: mapped });
+      logAudit({ action: "policies.search", outcome: "success", subject: "advanced", details: { count: mapped.length } });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unexpected error while searching.");
+      setLivePolicies(null);
+      logAudit({ action: "policies.search", outcome: "failure", subject: "advanced", details: { error: err instanceof Error ? err.message : "Unexpected error" } });
+    } finally {
+      setLoading(false);
+    }
+  }, [advanced]);
+
   // Pre-fill search from URL when linking from Customers (e.g. /policies?q=Amalia%20Dare or ?customer=88625).
   useEffect(() => {
     const q = searchParams.get("q") ?? searchParams.get("customer");
@@ -337,8 +433,8 @@ export default function PoliciesPage() {
         <CardHeader>
           <CardTitle>Search</CardTitle>
           <CardDescription>
-            Search by policy number, customer name, or email. Optionally filter by
-            effective date.
+            Quick search: policy number, customer name, or email, plus optional effective date.
+            Or use Advanced search to search by person (e.g. first name, last name).
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -377,6 +473,55 @@ export default function PoliciesPage() {
               </Button>
             </div>
           </div>
+
+          <Collapsible open={advancedOpen} onOpenChange={setAdvancedOpen} className="mt-4">
+            <CollapsibleTrigger asChild>
+              <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground">
+                {advancedOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                Advanced search (by person / demography)
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <div className="mt-4 pt-4 border-t border-border space-y-4">
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                  <div className="space-y-2">
+                    <Label>Search value (optional)</Label>
+                    <Input
+                      placeholder="Optional"
+                      value={advanced.searchvalue ?? ""}
+                      onChange={(e) => setAdvanced((a) => ({ ...a, searchvalue: e.target.value }))}
+                      className="bg-background"
+                    />
+                  </div>
+                </div>
+
+                <div className="rounded-lg border border-border bg-muted/20 p-4">
+                  <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">Person</h4>
+                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                    {(["firstName", "lastName", "middleName", "dateOfBirth", "gender", "nationality", "personalId", "personalIdType", "phoneNumber", "cellPhone"] as const).map((key) => (
+                      <div key={key} className="space-y-1">
+                        <Label className="text-xs">{key}</Label>
+                        <Input
+                          placeholder={key}
+                          value={advanced.person?.[key] ?? ""}
+                          onChange={(e) => setAdvanced((a) => ({ ...a, person: { ...a.person, [key]: e.target.value } }))}
+                          className="bg-background h-8 text-sm"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <Button
+                  type="button"
+                  disabled={loading}
+                  onClick={() => runAdvancedSearch()}
+                >
+                  {loading ? "Searching..." : "Search with criteria"}
+                </Button>
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
         </CardContent>
       </Card>
 

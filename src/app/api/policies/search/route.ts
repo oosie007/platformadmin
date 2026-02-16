@@ -1,6 +1,30 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getEnvKeyFromRequest, getEnvUrls, getEnvAuth, ENV_COOKIE_NAME } from "@/lib/env-config";
+import { getEnvKeyFromRequest, getEnvUrls, getEnvAuth, ENV_COOKIE_NAME, type EnvAuth } from "@/lib/env-config";
 import { appendAuditEntry } from "@/lib/audit-server";
+
+/** Advanced policy search: search by person (demography). Backend expects searchvalue, searchType (e.g. "ByDemography"), resultType (e.g. "Short"), person with all fields (use "" for unused). */
+export interface PolicySearchRequestBody {
+  impersonateId?: string;
+  language?: string;
+  /** Sent as "searchvalue" (lowercase) to backend. */
+  searchvalue?: string;
+  /** e.g. "ByDemography" */
+  searchType?: string;
+  /** e.g. "Short" or "Detailed" */
+  resultType?: string;
+  person?: {
+    dateOfBirth?: string;
+    firstName?: string;
+    lastName?: string;
+    middleName?: string;
+    gender?: string;
+    nationality?: string;
+    personalId?: string;
+    personalIdType?: string;
+    phoneNumber?: string;
+    cellPhone?: string;
+  };
+}
 
 interface TokenResponse {
   access_token?: string;
@@ -25,12 +49,29 @@ function decodeTokenPayload(token: string): { aud?: string; iss?: string; exp?: 
   }
 }
 
+/** Remove keys with undefined/null/empty string to keep payload clean. Preserves 0 and false. */
+function cleanPayload<T extends Record<string, unknown>>(obj: T): Partial<T> {
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(obj)) {
+    if (v === undefined || v === null) continue;
+    if (typeof v === "string" && v.trim() === "") continue;
+    if (Array.isArray(v)) {
+      out[k] = v;
+    } else if (typeof v === "object" && v !== null) {
+      const cleaned = cleanPayload(v as Record<string, unknown>);
+      if (Object.keys(cleaned).length > 0) out[k] = cleaned;
+    } else {
+      out[k] = v;
+    }
+  }
+  return out as Partial<T>;
+}
+
 export async function GET(req: NextRequest) {
   const date = req.nextUrl.searchParams.get("date");
   const q = req.nextUrl.searchParams.get("q")?.trim() || null;
   const searchTypeParam = req.nextUrl.searchParams.get("searchType") || null;
 
-  // Require either date (effective date search) or q (policy number / customer name / email search)
   if (!date && !q) {
     return NextResponse.json(
       { error: "Provide either 'date' (YYYY-MM-DD) or 'q' (policy number, customer name, or email)." },
@@ -53,25 +94,98 @@ export async function GET(req: NextRequest) {
     );
   }
 
+  const byDate = !!date;
+  const querySearchType = searchTypeParam ||
+    process.env.POLICY_SEARCH_TYPE_QUERY ||
+    "CustomerName";
+  const searchType = byDate
+    ? "ByPolicyEffectiveDate"
+    : (querySearchType === "ByCustomerName" ? "CustomerName" : querySearchType === "ByPolicyNumber" ? "PolicyNumber" : querySearchType);
+  const searchvalue = byDate ? (date ?? "") : (q ?? "");
+
+  const searchBody = {
+    impersonateID: auth.impersonateId,
+    language: "en",
+    searchvalue,
+    searchType,
+    resultType: "Detailed",
+  };
+
+  return runPolicySearch(req, envKey, auth, policyBaseUrl, searchBody, byDate ? date ?? undefined : q ?? undefined);
+}
+
+export async function POST(req: NextRequest) {
+  const envKey = getEnvKeyFromRequest(req.cookies.get(ENV_COOKIE_NAME)?.value);
+  const urls = getEnvUrls(envKey);
+  const auth = getEnvAuth(envKey);
+  const policyBaseUrl = urls.apiBaseUrl;
+
+  if (!auth.authUrl || !auth.resource || !auth.appId || !auth.appKey || !policyBaseUrl) {
+    return NextResponse.json(
+      {
+        error:
+          `Environment "${envKey}" is not fully configured. Set auth and API base URL for the selected environment in .env.local.`,
+      },
+      { status: 500 }
+    );
+  }
+
+  let body: PolicySearchRequestBody;
   try {
-    const tokenRes = await fetch(auth.authUrl, {
+    body = (await req.json()) as PolicySearchRequestBody;
+  } catch {
+    return NextResponse.json(
+      { error: "Request body must be valid JSON." },
+      { status: 400 }
+    );
+  }
+
+  // Build backend payload: impersonateId, language, searchvalue (lowercase), searchType, resultType, person (all keys, "" for unused)
+  const personKeys = ["dateOfBirth", "firstName", "lastName", "middleName", "gender", "nationality", "personalId", "personalIdType", "phoneNumber", "cellPhone"] as const;
+  const personPayload: Record<string, string> = {};
+  for (const k of personKeys) {
+    personPayload[k] = (body.person?.[k] ?? "").trim();
+  }
+  const searchBody: Record<string, unknown> = {
+    impersonateId: body.impersonateId ?? auth.impersonateId ?? "",
+    language: (body.language ?? "en").trim() || "en",
+    searchvalue: (body.searchvalue ?? "").trim(),
+    searchType: (body.searchType ?? "ByDemography").trim() || "ByDemography",
+    resultType: (body.resultType ?? "Short").trim() || "Short",
+    person: personPayload,
+  };
+
+  const subject = body.person?.firstName ?? body.person?.lastName ?? body.searchvalue ?? "advanced";
+  return runPolicySearch(req, envKey, auth, policyBaseUrl, searchBody, subject);
+}
+
+async function runPolicySearch(
+  _req: NextRequest,
+  envKey: string,
+  auth: EnvAuth,
+  policyBaseUrl: string,
+  searchBody: Record<string, unknown>,
+  subject: string | undefined
+) {
+  try {
+    const tokenRes = await fetch(auth.authUrl!, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         apiVersion: auth.authApiVersion,
-        Resource: auth.resource,
-        App_ID: auth.appId,
-        App_Key: auth.appKey,
+        Resource: auth.resource ?? "",
+        App_ID: auth.appId ?? "",
+        App_Key: auth.appKey ?? "",
       },
     });
 
     if (!tokenRes.ok) {
-      const body = await tokenRes.text();
+      const bodyText = await tokenRes.text();
       return NextResponse.json(
         {
-          error: "Failed to obtain access token from UAT authorization endpoint.",
+          error: "Failed to obtain access token from authorization endpoint.",
           status: tokenRes.status,
-          body,
+          body: bodyText,
         },
         { status: 502 }
       );
@@ -94,7 +208,7 @@ export async function GET(req: NextRequest) {
     const rawToken =
       tokenJson.access_token ??
       (tokenJson as Record<string, unknown>).accessToken;
-    let accessToken: string | undefined =
+    const accessToken: string | undefined =
       typeof rawToken === "string" ? rawToken.trim() : undefined;
 
     if (!accessToken) {
@@ -107,28 +221,9 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Step 2: call policy search API
-    // API expects PolicySearchType enum (e.g. "CustomerName", "PolicyNumber") not "ByCustomerName" / "ByPolicyNumber".
-    const byDate = !!date;
-    const querySearchType = searchTypeParam ||
-      process.env.POLICY_SEARCH_TYPE_QUERY ||
-      "CustomerName";
-    const searchType = byDate
-      ? "ByPolicyEffectiveDate"
-      : (querySearchType === "ByCustomerName" ? "CustomerName" : querySearchType === "ByPolicyNumber" ? "PolicyNumber" : querySearchType);
-    const searchvalue = byDate ? date : (q ?? "");
-
-    const searchBody = {
-      impersonateID: auth.impersonateId,
-      language: "en",
-      searchvalue,
-      searchType,
-      resultType: "Detailed",
-    };
-
     // Postman Policy Search uses header "apiversion: 2" (lowercase), no query param on URL
     const policyApiVersion =
-      envKey === "sit"
+      envKey === "sit" || envKey === "sit-latam"
         ? process.env.SIT_POLICY_API_VERSION ||
           process.env.POLICY_API_VERSION ||
           "2"
@@ -204,7 +299,7 @@ export async function GET(req: NextRequest) {
         action: "api.policies.search",
         outcome: "failure",
         context: envKey,
-        subject: byDate ? date : q ?? undefined,
+        subject,
         details: { status: searchRes.status, bodyPreview: raw.slice(0, 200) },
       });
       return NextResponse.json(payload, { status: 502 });
@@ -217,7 +312,7 @@ export async function GET(req: NextRequest) {
         action: "api.policies.search",
         outcome: "success",
         context: envKey,
-        subject: byDate ? date : q ?? undefined,
+        subject,
         details: { resultCount: Array.isArray(json?.details) ? json.details.length : "unknown" },
       });
       return NextResponse.json(json);

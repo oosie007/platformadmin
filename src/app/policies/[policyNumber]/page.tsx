@@ -21,6 +21,17 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import {
+  CustomerDetailSections,
+  type AddressEntry,
+  type DetailEntry,
+} from "@/components/customer-detail-sections";
 import { ChevronDown, ChevronRight, Loader2 } from "lucide-react";
 
 /** Transaction as returned by the policy detail API */
@@ -1099,16 +1110,91 @@ export default function PolicyDetailPage() {
                           </div>
                         )}
                       </dl>
-                      {((person?.accountId != null) || ((ins as { accountId?: string }).accountId != null)) && (
-                        <div className="mt-3 pt-3 border-t border-border">
-                          <Link
-                            href={`/customers?q=${encodeURIComponent(String(person?.accountId ?? (ins as { accountId: string }).accountId))}${policyNumber ? `&policyNumber=${encodeURIComponent(policyNumber)}` : ""}`}
-                            className="text-xs underline-offset-2 hover:underline text-primary"
-                          >
-                            View customer in Customers →
-                          </Link>
-                        </div>
-                      )}
+                      {((person?.accountId != null) || ((ins as { accountId?: string }).accountId != null)) && (() => {
+                        const accountIdStr = String(person?.accountId ?? (ins as { accountId: string }).accountId);
+                        const formalName = displayName !== "—" ? displayName : undefined;
+                        const roles = ins.role ? [ins.role] : (ins.coverageVariants?.map((cv) => cv.coverageVariantDesc).filter(Boolean) as string[] | undefined);
+                        const identityEntries: DetailEntry[] = [
+                          { label: "Account ID", value: accountIdStr },
+                          { label: "Roles", value: roles?.join(", ") ?? "—" },
+                          { label: "Customer type", value: "Individual" },
+                          { label: "Title", value: title ?? "—" },
+                          { label: "First name", value: ins.firstName ?? "—" },
+                          { label: "Last name", value: ins.lastName ?? "—" },
+                          { label: "Formal name", value: formalName ?? "—" },
+                        ];
+                        const countryLabel = person?.addresses?.[0] != null && typeof person.addresses[0].country === "object" && person.addresses[0].country?.label
+                          ? person.addresses[0].country.label
+                          : "—";
+                        const demographicsEntries: DetailEntry[] = [
+                          { label: "Gender", value: gender },
+                          { label: "Date of birth", value: dob },
+                          { label: "Country", value: countryLabel },
+                          { label: "Preferred language", value: "—" },
+                        ];
+                        const contactIdsEntries: DetailEntry[] = [
+                          { label: "Email", value: email },
+                          { label: "Phone", value: phone },
+                          { label: "Personal ID type", value: "—" },
+                          { label: "Personal ID", value: personalId },
+                        ];
+                        const occupationEntries: DetailEntry[] = occupation !== "—"
+                          ? [{ label: "Primary occupation", value: occupation }]
+                          : [];
+                        const addressList: AddressEntry[] = [];
+                        if (Array.isArray(person?.addresses) && person.addresses.length > 0) {
+                          person.addresses.forEach((a) => {
+                            const lines = [a.addressLine1, a.addressLine2, a.addressLine3, a.addressLine4].filter(Boolean).join(", ");
+                            const country = typeof a.country === "object" && a.country?.label ? a.country.label : (a.country as string) ?? "";
+                            const cityPostalCountry = [a.city, a.postalCode, country].filter(Boolean).join(", ");
+                            const contactDetailsStr = a.contactDetails?.map((c) => `${c.type ?? ""}: ${c.detail ?? ""}`).join(" · ");
+                            addressList.push({
+                              typeLabel: "Home",
+                              lines: lines || undefined,
+                              cityPostalCountry: cityPostalCountry || undefined,
+                              contactDetails: contactDetailsStr || undefined,
+                            });
+                          });
+                        } else if (addressStr !== "—") {
+                          addressList.push({
+                            typeLabel: "Home",
+                            lines: addressStr,
+                            contactDetails: phone !== "—" ? `phone: ${phone}` : undefined,
+                          });
+                        }
+                        const otherEntries: DetailEntry[] = [
+                          { label: "Medical reimbursement", value: "—" },
+                        ];
+                        return (
+                          <div className="mt-3 border-t border-border pt-3">
+                            <Accordion type="single" collapsible className="w-full">
+                              <AccordionItem value="customer-detail" className="border-none">
+                                <AccordionTrigger className="py-2 text-xs hover:no-underline hover:bg-muted/50 rounded-md px-2 -mx-2">
+                                  View full customer details
+                                </AccordionTrigger>
+                                <AccordionContent>
+                                  <CustomerDetailSections
+                                    identity={identityEntries}
+                                    demographics={demographicsEntries}
+                                    contactIds={contactIdsEntries}
+                                    occupation={occupationEntries.length > 0 ? occupationEntries : undefined}
+                                    addresses={addressList.length > 0 ? addressList : undefined}
+                                    other={otherEntries}
+                                  />
+                                  <p className="mt-3 text-xs text-muted-foreground">
+                                    <Link
+                                      href={`/customers?q=${encodeURIComponent(accountIdStr)}${policyNumber ? `&policyNumber=${encodeURIComponent(policyNumber)}` : ""}`}
+                                      className="underline-offset-2 hover:underline text-primary"
+                                    >
+                                      Open in Customers →
+                                    </Link>
+                                  </p>
+                                </AccordionContent>
+                              </AccordionItem>
+                            </Accordion>
+                          </div>
+                        );
+                      })()}
                     </div>
                   );
                 })}

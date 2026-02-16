@@ -1,5 +1,5 @@
 /**
- * Resolves base URLs for a given environment (sit | uat).
+ * Resolves base URLs and auth for a given environment (EMEA: sit | uat; LATAM: sit-latam | uat-latam).
  * Used by API routes only; env selection comes from cookie/header.
  */
 
@@ -31,9 +31,31 @@ export interface EnvAuth {
 
 /**
  * Get auth credentials for the given env. Token is fetched from the env-specific auth URL with env-specific app id/key.
- * SIT falls back to legacy UAT_AUTH_* if SIT_EMEA_AUTH_* are not set. UAT uses UAT_EMEA_AUTH_*.
+ * EMEA: SIT (SIT_EMEA_* / legacy UAT_*), UAT (UAT_EMEA_*). LATAM: sit-latam (SIT_LATAM_*), uat-latam (UAT_LATAM_*).
  */
 export function getEnvAuth(envKey: EnvKey): EnvAuth {
+  if (envKey === "uat-latam") {
+    return {
+      authUrl: process.env.UAT_LATAM_AUTH_URL ?? null,
+      authApiVersion: process.env.UAT_LATAM_AUTH_API_VERSION ?? "1",
+      resource: process.env.UAT_LATAM_AUTH_RESOURCE ?? null,
+      appId: process.env.UAT_LATAM_AUTH_APP_ID ?? null,
+      appKey: process.env.UAT_LATAM_AUTH_APP_KEY ?? null,
+      impersonateId: process.env.UAT_LATAM_IMPERSONATE_ID ?? "",
+      apimSubscriptionKey: process.env.UAT_LATAM_APIM_SUBSCRIPTION_KEY ?? null,
+    };
+  }
+  if (envKey === "sit-latam") {
+    return {
+      authUrl: process.env.SIT_LATAM_AUTH_URL ?? null,
+      authApiVersion: process.env.SIT_LATAM_AUTH_API_VERSION ?? "1",
+      resource: process.env.SIT_LATAM_AUTH_RESOURCE ?? null,
+      appId: process.env.SIT_LATAM_AUTH_APP_ID ?? null,
+      appKey: process.env.SIT_LATAM_AUTH_APP_KEY ?? null,
+      impersonateId: process.env.SIT_LATAM_IMPERSONATE_ID ?? "",
+      apimSubscriptionKey: process.env.SIT_LATAM_APIM_SUBSCRIPTION_KEY ?? null,
+    };
+  }
   if (envKey === "uat") {
     return {
       authUrl:
@@ -69,7 +91,7 @@ export function getEnvAuth(envKey: EnvKey): EnvAuth {
         null,
     };
   }
-  // sit: prefer SIT_EMEA_AUTH_*, then legacy UAT_*
+  // sit (EMEA): prefer SIT_EMEA_AUTH_*, then legacy UAT_*
   return {
     authUrl:
       process.env.SIT_EMEA_AUTH_URL ??
@@ -118,9 +140,25 @@ export interface EnvUrls {
 }
 
 /**
- * Get base URLs for the given env. Falls back to legacy UAT_* vars for "sit" if SIT_EMEA_* are not set.
+ * Get base URLs for the given env. EMEA: sit/uat (SIT_EMEA_* / UAT_EMEA_*). LATAM: sit-latam (SIT_LATAM_*), uat-latam (UAT_LATAM_*).
  */
 export function getEnvUrls(envKey: EnvKey): EnvUrls {
+  if (envKey === "uat-latam") {
+    return {
+      apiBaseUrl: process.env.UAT_LATAM_API_BASE_URL ?? null,
+      documentApiBaseUrl: process.env.UAT_LATAM_DOCUMENT_API_BASE_URL ?? null,
+      catalystProductUrl: process.env.UAT_LATAM_CATALYST_PRODUCT_URL ?? null,
+      endorsementApiBaseUrl: process.env.UAT_LATAM_ENDORSEMENT_API_BASE_URL ?? null,
+    };
+  }
+  if (envKey === "sit-latam") {
+    return {
+      apiBaseUrl: process.env.SIT_LATAM_API_BASE_URL ?? null,
+      documentApiBaseUrl: process.env.SIT_LATAM_DOCUMENT_API_BASE_URL ?? null,
+      catalystProductUrl: process.env.SIT_LATAM_CATALYST_PRODUCT_URL ?? null,
+      endorsementApiBaseUrl: process.env.SIT_LATAM_ENDORSEMENT_API_BASE_URL ?? null,
+    };
+  }
   if (envKey === "uat") {
     return {
       apiBaseUrl:
@@ -141,7 +179,7 @@ export function getEnvUrls(envKey: EnvKey): EnvUrls {
         null,
     };
   }
-  // sit: prefer SIT_EMEA_*, then legacy UAT_* for backward compatibility
+  // sit (EMEA): prefer SIT_EMEA_*, then legacy UAT_*
   return {
     apiBaseUrl:
       process.env.SIT_EMEA_API_BASE_URL ??
